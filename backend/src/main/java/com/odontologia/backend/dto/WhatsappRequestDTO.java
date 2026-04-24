@@ -5,6 +5,7 @@ public class WhatsappRequestDTO {
 	private Long tenantId;
 	private Long pacienteId;
 	private Long agendamentoId;
+	private String tipo;
 	private String telefone;
 	private String mensagem;
 
@@ -30,6 +31,14 @@ public class WhatsappRequestDTO {
 
 	public void setAgendamentoId(Long agendamentoId) {
 		this.agendamentoId = agendamentoId;
+	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
 	}
 
 	public String getTelefone() {
