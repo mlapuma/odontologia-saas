@@ -4,6 +4,7 @@ import com.odontologia.backend.dto.WhatsappRequestDTO;
 import com.odontologia.backend.entity.AgendamentoEntity;
 import com.odontologia.backend.entity.PacienteEntity;
 import com.odontologia.backend.repository.AgendamentoRepository;
+import com.odontologia.backend.repository.NotificacaoWhatsappRepository;
 import com.odontologia.backend.repository.PacienteRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +17,14 @@ public class LembreteConsultaService {
 
 	private final AgendamentoRepository agendamentoRepository;
 	private final PacienteRepository pacienteRepository;
+	private final NotificacaoWhatsappRepository notificacaoRepository;
 	private final WhatsappService whatsappService;
 
 	public LembreteConsultaService(AgendamentoRepository agendamentoRepository, PacienteRepository pacienteRepository,
-			WhatsappService whatsappService) {
+			NotificacaoWhatsappRepository notificacaoRepository, WhatsappService whatsappService) {
 		this.agendamentoRepository = agendamentoRepository;
 		this.pacienteRepository = pacienteRepository;
+		this.notificacaoRepository = notificacaoRepository;
 		this.whatsappService = whatsappService;
 	}
 
@@ -38,14 +41,23 @@ public class LembreteConsultaService {
 				continue;
 			}
 
+			boolean lembreteJaEnviado = notificacaoRepository.existsByTenantIdAndAgendamentoIdAndTipo(tenantId,
+					agendamento.getId(), "LEMBRETE_AGENDAMENTO");
+			if (lembreteJaEnviado) {
+				continue;
+			}
+
 			PacienteEntity paciente = pacienteRepository.findById(agendamento.getPacienteId()).orElseThrow();
+			if (paciente.getWhatsapp() == null || paciente.getWhatsapp().isBlank()) {
+				continue;
+			}
 
 			String dataHora = agendamento.getDataHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 
 			String mensagem = """
-					Olá %s 👋
+					Ola %s.
 
-					Sua consulta está agendada para %s.
+					Sua consulta esta agendada para %s.
 
 					Responda:
 					1 - Confirmar
@@ -56,6 +68,7 @@ public class LembreteConsultaService {
 			dto.setTenantId(tenantId);
 			dto.setPacienteId(paciente.getId());
 			dto.setAgendamentoId(agendamento.getId());
+			dto.setTipo("LEMBRETE_AGENDAMENTO");
 			dto.setTelefone(paciente.getWhatsapp());
 			dto.setMensagem(mensagem);
 
