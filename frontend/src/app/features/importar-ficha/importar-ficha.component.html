@@ -1,0 +1,48 @@
+<div class="pagina-importacao">
+  <div class="cabecalho">
+    <h1>Importar ficha</h1>
+    <p>Leia a ficha escaneada, revise os campos e confirme o cadastro.</p>
+  </div>
+
+  <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+  <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="aviso" *ngIf="aviso">{{ aviso }}</p>
+
+  <section class="card upload">
+    <input type="file" accept="image/*,.pdf" (change)="selecionarArquivo($event)" />
+    <button class="btn-primary" type="button" (click)="analisarFicha()" [disabled]="carregando">
+      {{ carregando ? 'Analisando...' : 'Analisar ficha' }}
+    </button>
+  </section>
+
+  <section class="card formulario" *ngIf="previewGerado">
+    <h2>Identificacao do paciente</h2>
+
+    <div class="campos">
+      <input [(ngModel)]="paciente.nome" placeholder="Nome" />
+      <input [(ngModel)]="paciente.cpf" placeholder="CPF" />
+      <input [(ngModel)]="paciente.telefone" placeholder="Telefone" />
+      <input [(ngModel)]="paciente.whatsapp" placeholder="WhatsApp" />
+      <input [(ngModel)]="paciente.email" placeholder="E-mail" />
+      <input [(ngModel)]="paciente.dataNascimento" type="date" placeholder="Data de nascimento" />
+      <input [(ngModel)]="paciente.endereco" placeholder="Endereco" />
+      <input [(ngModel)]="paciente.numero" placeholder="Numero" />
+      <input [(ngModel)]="paciente.complemento" placeholder="Complemento" />
+      <input [(ngModel)]="paciente.bairro" placeholder="Bairro" />
+      <input [(ngModel)]="paciente.cep" placeholder="CEP" />
+      <input [(ngModel)]="paciente.cidade" placeholder="Cidade" />
+      <input [(ngModel)]="paciente.uf" placeholder="UF" maxlength="2" />
+    </div>
+
+    <div class="acoes">
+      <button class="btn-primary" type="button" (click)="salvarPaciente()" [disabled]="salvando">
+        {{ salvando ? 'Salvando...' : 'Cadastrar paciente' }}
+      </button>
+    </div>
+  </section>
+
+  <section class="card texto-extraido" *ngIf="textoExtraido">
+    <h2>Texto extraido</h2>
+    <pre>{{ textoExtraido }}</pre>
+  </section>
+</div>

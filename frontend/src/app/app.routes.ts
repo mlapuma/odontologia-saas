@@ -6,6 +6,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { PacientesComponent } from './features/pacientes/pacientes.component';
 import { AgendaComponent } from './features/agenda/agenda.component';
 import { FinanceiroComponent } from './features/financeiro/financeiro.component';
+import { ImportarFichaComponent } from './features/importar-ficha/importar-ficha.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -16,6 +17,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'pacientes', component: PacientesComponent },
+      { path: 'importar-ficha', component: ImportarFichaComponent },
       { path: 'agenda', component: AgendaComponent },
       { path: 'financeiro', component: FinanceiroComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
