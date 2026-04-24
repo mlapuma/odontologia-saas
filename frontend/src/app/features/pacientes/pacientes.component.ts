@@ -10,7 +10,7 @@ import { PacienteService } from '../../services/paciente.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './pacientes.component.html',
-  styleUrl: './pacientes.component.scss'
+  styleUrl: './pacientes.component.css'
 })
 export class PacientesComponent implements OnInit {
 

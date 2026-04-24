@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+  styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
   resumo: any;
