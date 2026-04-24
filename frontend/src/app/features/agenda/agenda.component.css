@@ -4,20 +4,37 @@
 
 .agenda-header {
   margin-bottom: 20px;
+}
 
-  h1 {
-    margin: 0 0 8px;
-  }
+.agenda-header h1 {
+  margin: 0 0 8px;
+}
 
-  p {
-    margin: 0;
-    color: #6b7280;
-  }
+.agenda-header p {
+  margin: 0;
+  color: #6b7280;
 }
 
 .agenda-card {
   background: #fff;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 20px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.sucesso,
+.erro {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.sucesso {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.erro {
+  color: #991b1b;
+  background: #fee2e2;
 }

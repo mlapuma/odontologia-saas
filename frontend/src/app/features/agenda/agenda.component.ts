@@ -7,18 +7,25 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { AgendaService } from '../../services/agenda.service';
 import { AgendaEvento } from '../../models/agenda-evento.model';
+import { AgendaModalComponent } from './agenda-modal/agenda-modal.component';
 
 
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, FullCalendarModule],
+  imports: [CommonModule, FullCalendarModule, AgendaModalComponent],
   templateUrl: './agenda.component.html',
-  styleUrl: './agenda.component.scss'
+  styleUrl: './agenda.component.css'
 })
 export class AgendaComponent {
 
   eventos: AgendaEvento[] = [];
+  modalAberto = false;
+  modalInicio = '';
+  modalAgendamentoId?: number | null;
+  ultimaJanela?: DatesSetArg;
+  mensagem = '';
+  erro = '';
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -36,7 +43,10 @@ export class AgendaComponent {
       right: 'timeGridDay,timeGridWeek,dayGridMonth'
     },
     events: [],
-    datesSet: (arg) => this.carregarEventos(arg),
+    datesSet: (arg) => {
+      this.ultimaJanela = arg;
+      this.carregarEventos(arg);
+    },
     select: (arg) => this.novoAgendamento(arg),
     eventClick: (arg) => this.detalharEvento(arg)
   };
@@ -44,6 +54,7 @@ export class AgendaComponent {
   constructor(private agendaService: AgendaService) { }
 
   carregarEventos(arg: DatesSetArg): void {
+    this.erro = '';
     const inicio = arg.start.toISOString().slice(0, 19);
     const fim = arg.end.toISOString().slice(0, 19);
 
@@ -64,15 +75,50 @@ export class AgendaComponent {
       },
       error: (err) => {
         console.error('Erro ao carregar agenda', err);
+        this.erro = 'Erro ao carregar agenda.';
       }
     });
   }
 
   novoAgendamento(arg: DateSelectArg): void {
-    alert(`Novo agendamento em: ${arg.startStr}`);
+    this.mensagem = '';
+    this.modalAgendamentoId = null;
+    this.modalInicio = this.formatarDataLocal(arg.start);
+    this.modalAberto = true;
   }
 
   detalharEvento(arg: EventClickArg): void {
-    alert(`Agendamento selecionado: ${arg.event.title}`);
+    this.mensagem = '';
+    this.modalInicio = '';
+    this.modalAgendamentoId = Number(arg.event.id);
+    this.modalAberto = true;
+  }
+
+  fecharModal(): void {
+    this.modalAberto = false;
+    this.modalAgendamentoId = null;
+    this.modalInicio = '';
+  }
+
+  agendamentoSalvo(): void {
+    this.mensagem = 'Agendamento salvo com sucesso.';
+    this.fecharModal();
+
+    if (this.ultimaJanela) {
+      this.carregarEventos(this.ultimaJanela);
+    }
+  }
+
+  private formatarDataLocal(data: Date): string {
+    const ano = data.getFullYear();
+    const mes = this.doisDigitos(data.getMonth() + 1);
+    const dia = this.doisDigitos(data.getDate());
+    const hora = this.doisDigitos(data.getHours());
+    const minuto = this.doisDigitos(data.getMinutes());
+    return `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+  }
+
+  private doisDigitos(valor: number): string {
+    return String(valor).padStart(2, '0');
   }
 }

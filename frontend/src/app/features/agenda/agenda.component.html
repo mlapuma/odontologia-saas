@@ -1,10 +1,21 @@
 <div class="agenda-page">
   <div class="agenda-header">
     <h1>Agenda</h1>
-    <p>Visualização semanal e diária dos agendamentos.</p>
+    <p>Visualizacao semanal e diaria dos agendamentos.</p>
   </div>
+
+  <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+  <p class="erro" *ngIf="erro">{{ erro }}</p>
 
   <div class="agenda-card">
     <full-calendar [options]="calendarOptions"></full-calendar>
   </div>
+
+  <app-agenda-modal
+    [aberto]="modalAberto"
+    [dataHoraInicio]="modalInicio"
+    [agendamentoId]="modalAgendamentoId"
+    (fechar)="fecharModal()"
+    (salvo)="agendamentoSalvo()">
+  </app-agenda-modal>
 </div>

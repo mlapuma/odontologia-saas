@@ -1,0 +1,69 @@
+<div class="modal-backdrop" *ngIf="aberto">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="agenda-modal-title">
+    <header class="modal-header">
+      <div>
+        <h2 id="agenda-modal-title">{{ modoDetalhe ? 'Detalhes do agendamento' : 'Novo agendamento' }}</h2>
+        <p>{{ modoDetalhe ? 'Consulta selecionada na agenda.' : 'Cadastro rapido a partir do horario selecionado.' }}</p>
+      </div>
+      <button class="btn-icon" type="button" aria-label="Fechar" (click)="fecharModal()">x</button>
+    </header>
+
+    <p class="erro" *ngIf="erro">{{ erro }}</p>
+    <p class="carregando" *ngIf="carregando">Carregando...</p>
+
+    <form class="formulario" *ngIf="!carregando" (ngSubmit)="salvarAgendamento()">
+      <label>
+        Paciente
+        <select [(ngModel)]="form.pacienteId" name="pacienteId" [disabled]="modoDetalhe">
+          <option [ngValue]="null">Selecione</option>
+          <option *ngFor="let paciente of pacientes" [ngValue]="paciente.id">{{ paciente.nome }}</option>
+        </select>
+      </label>
+
+      <label>
+        Profissional
+        <input [(ngModel)]="form.profissionalId" name="profissionalId" type="number" min="1" [readonly]="modoDetalhe" />
+      </label>
+
+      <label>
+        Horario
+        <input [(ngModel)]="form.dataHoraInicio" name="dataHoraInicio" type="datetime-local" [readonly]="modoDetalhe" />
+      </label>
+
+      <div class="linha">
+        <label>
+          Procedimento
+          <select [(ngModel)]="form.procedimentoId" name="procedimentoId" [disabled]="modoDetalhe">
+            <option [ngValue]="null">Selecione</option>
+            <option *ngFor="let procedimento of procedimentos" [ngValue]="procedimento.id">
+              {{ procedimento.nome }}
+            </option>
+          </select>
+        </label>
+
+        <label>
+          Qtde
+          <input [(ngModel)]="form.quantidade" name="quantidade" type="number" min="1" [readonly]="modoDetalhe" />
+        </label>
+      </div>
+
+      <label *ngIf="!modoDetalhe">
+        Observacoes
+        <textarea [(ngModel)]="form.observacoes" name="observacoes" rows="3"></textarea>
+      </label>
+
+      <div class="resumo" *ngIf="procedimentoSelecionado || detalhe">
+        <span>Duracao: {{ detalhe?.duracaoTotalMinutos || duracaoEstimada }} min</span>
+        <span>Valor: {{ (detalhe?.valorTotal || valorEstimado) | currency:'BRL' }}</span>
+        <span *ngIf="detalhe">Status: {{ detalhe.status }}</span>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="btn-secondary" type="button" (click)="fecharModal()">Fechar</button>
+        <button class="btn-primary" type="submit" *ngIf="!modoDetalhe" [disabled]="salvando">
+          {{ salvando ? 'Salvando...' : 'Salvar agendamento' }}
+        </button>
+      </footer>
+    </form>
+  </section>
+</div>
