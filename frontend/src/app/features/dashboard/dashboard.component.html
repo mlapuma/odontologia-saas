@@ -1,0 +1,33 @@
+<h1>Dashboard da Clínica</h1>
+
+<div class="grid" *ngIf="resumo">
+  <div class="card">
+    <h3>Pacientes</h3>
+    <p>{{ resumo.pacientesTotal }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Pacientes Ativos</h3>
+    <p>{{ resumo.pacientesAtivos }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Agendamentos Hoje</h3>
+    <p>{{ resumo.agendamentosHoje }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Confirmadas Hoje</h3>
+    <p>{{ resumo.consultasConfirmadasHoje }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Canceladas Hoje</h3>
+    <p>{{ resumo.consultasCanceladasHoje }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Faturamento Previsto</h3>
+    <p>{{ resumo.faturamentoPrevistoHoje }}</p>
+  </div>
+</div>

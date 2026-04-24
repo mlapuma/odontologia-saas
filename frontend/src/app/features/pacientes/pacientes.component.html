@@ -1,0 +1,69 @@
+<div class="pagina-pacientes">
+    <div class="cabecalho">
+        <h1>Pacientes</h1>
+        <p>Cadastro e gestão de pacientes da clínica.</p>
+    </div>
+
+    <div class="mensagens">
+        <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+        <p class="erro" *ngIf="erro">{{ erro }}</p>
+    </div>
+
+    <div class="grid">
+        <section class="card formulario">
+            <h2>{{ editando ? 'Editar Paciente' : 'Novo Paciente' }}</h2>
+
+            <div class="campos">
+                <input [(ngModel)]="pacienteForm.nome" placeholder="Nome" />
+                <input [(ngModel)]="pacienteForm.cpf" placeholder="CPF" />
+                <input [(ngModel)]="pacienteForm.telefone" placeholder="Telefone" />
+                <input [(ngModel)]="pacienteForm.whatsapp" placeholder="WhatsApp" />
+                <input [(ngModel)]="pacienteForm.email" placeholder="E-mail" />
+                <input [(ngModel)]="pacienteForm.dataNascimento" type="date" placeholder="Data de nascimento" />
+                <input [(ngModel)]="pacienteForm.cidade" placeholder="Cidade" />
+                <input [(ngModel)]="pacienteForm.uf" placeholder="UF" maxlength="2" />
+            </div>
+
+            <div class="acoes-form">
+                <button class="btn-primary" (click)="salvar()">
+                    {{ editando ? 'Atualizar' : 'Salvar' }}
+                </button>
+                <button class="btn-secondary" (click)="cancelar()">
+                    Cancelar
+                </button>
+            </div>
+        </section>
+
+        <section class="card lista">
+            <h2>Lista de Pacientes</h2>
+
+            <p *ngIf="carregando">Carregando...</p>
+
+            <table *ngIf="!carregando">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <th>WhatsApp</th>
+                        <th>E-mail</th>
+                        <th>Cidade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let paciente of pacientes">
+                        <td>{{ paciente.nome }}</td>
+                        <td>{{ paciente.telefone }}</td>
+                        <td>{{ paciente.whatsapp }}</td>
+                        <td>{{ paciente.email }}</td>
+                        <td>{{ paciente.cidade }}</td>
+                        <td class="acoes-tabela">
+                            <button class="btn-editar" (click)="editar(paciente)">Editar</button>
+                            <button class="btn-excluir" (click)="excluir(paciente.id)">Excluir</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+<div class="login-page">
+  <div class="login-box">
+    <h2>Login da Clínica</h2>
+
+    <input [(ngModel)]="email" placeholder="E-mail" />
+    <input [(ngModel)]="senha" type="password" placeholder="Senha" />
+
+    <button (click)="entrar()">Entrar</button>
+
+    <p *ngIf="erro" class="erro">{{ erro }}</p>
+  </div>
+</div>

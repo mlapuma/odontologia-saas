@@ -1,0 +1,27 @@
+<div class="layout">
+    <aside class="sidebar">
+        <div class="logo">Clínica LaCari Odontologia</div>
+
+        <nav class="menu">
+            <a routerLink="/app/dashboard">Dashboard</a>
+            <a routerLink="/app/pacientes">Pacientes</a>
+            <a routerLink="/app/agenda">Agenda</a>
+            <a routerLink="/app/financeiro">Financeiro</a>
+        </nav>
+    </aside>
+
+    <div class="content-area">
+        <header class="topbar">
+            <div>
+                <strong>{{ nomeUsuario }}</strong>
+                <span class="perfil">{{ perfil }}</span>
+            </div>
+
+            <button (click)="logout()">Sair</button>
+        </header>
+
+        <main class="content">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>
