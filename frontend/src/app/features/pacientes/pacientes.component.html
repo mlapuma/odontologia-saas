@@ -1,7 +1,7 @@
 <div class="pagina-pacientes">
     <div class="cabecalho">
         <h1>Pacientes</h1>
-        <p>Cadastro e gestão de pacientes da clínica.</p>
+        <p>Cadastro e gestao de pacientes da clinica.</p>
     </div>
 
     <div class="mensagens">
@@ -20,6 +20,11 @@
                 <input [(ngModel)]="pacienteForm.whatsapp" placeholder="WhatsApp" />
                 <input [(ngModel)]="pacienteForm.email" placeholder="E-mail" />
                 <input [(ngModel)]="pacienteForm.dataNascimento" type="date" placeholder="Data de nascimento" />
+                <input [(ngModel)]="pacienteForm.endereco" placeholder="Endereco" />
+                <input [(ngModel)]="pacienteForm.numero" placeholder="Numero" />
+                <input [(ngModel)]="pacienteForm.complemento" placeholder="Complemento" />
+                <input [(ngModel)]="pacienteForm.bairro" placeholder="Bairro" />
+                <input [(ngModel)]="pacienteForm.cep" placeholder="CEP" />
                 <input [(ngModel)]="pacienteForm.cidade" placeholder="Cidade" />
                 <input [(ngModel)]="pacienteForm.uf" placeholder="UF" maxlength="2" />
             </div>
@@ -46,8 +51,9 @@
                         <th>Telefone</th>
                         <th>WhatsApp</th>
                         <th>E-mail</th>
+                        <th>Endereco</th>
                         <th>Cidade</th>
-                        <th>Ações</th>
+                        <th>Acoes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,6 +62,7 @@
                         <td>{{ paciente.telefone }}</td>
                         <td>{{ paciente.whatsapp }}</td>
                         <td>{{ paciente.email }}</td>
+                        <td>{{ paciente.endereco }}</td>
                         <td>{{ paciente.cidade }}</td>
                         <td class="acoes-tabela">
                             <button class="btn-editar" (click)="editar(paciente)">Editar</button>

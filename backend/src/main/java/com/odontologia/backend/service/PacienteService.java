@@ -39,6 +39,11 @@ public class PacienteService {
 		existente.setTelefone(paciente.getTelefone());
 		existente.setWhatsapp(paciente.getWhatsapp());
 		existente.setEmail(paciente.getEmail());
+		existente.setEndereco(paciente.getEndereco());
+		existente.setNumero(paciente.getNumero());
+		existente.setComplemento(paciente.getComplemento());
+		existente.setBairro(paciente.getBairro());
+		existente.setCep(paciente.getCep());
 		existente.setCidade(paciente.getCidade());
 		existente.setUf(paciente.getUf());
 

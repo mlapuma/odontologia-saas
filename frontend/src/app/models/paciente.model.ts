@@ -7,6 +7,11 @@ export interface Paciente {
     telefone?: string;
     whatsapp?: string;
     email?: string;
+    endereco?: string;
+    numero?: string;
+    complemento?: string;
+    bairro?: string;
+    cep?: string;
     dataNascimento?: string;
     cidade?: string;
     uf?: string;
