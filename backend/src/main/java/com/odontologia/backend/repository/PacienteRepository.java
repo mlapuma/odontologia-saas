@@ -34,13 +34,22 @@ public interface PacienteRepository extends JpaRepository<PacienteEntity, Long> 
 			  and p.ativo = true
 			  and p.whatsapp is not null
 			  and trim(p.whatsapp) <> ''
-			  and exists (
-			    select a.id
-			    from AgendamentoEntity a
-			    where a.tenantId = :tenantId
-			      and a.pacienteId = p.id
-			      and a.status = 'REALIZADO'
-			      and a.dataHoraInicio < :limite
+			  and (
+			    exists (
+			      select a.id
+			      from AgendamentoEntity a
+			      where a.tenantId = :tenantId
+			        and a.pacienteId = p.id
+			        and a.status = 'REALIZADO'
+			        and a.dataHoraInicio < :limite
+			    )
+			    or exists (
+			      select t.id
+			      from TratamentoRealizadoEntity t
+			      where t.tenantId = :tenantId
+			        and t.pacienteId = p.id
+			        and t.dataRealizacao < :limiteData
+			    )
 			  )
 			  and not exists (
 			    select a2.id
@@ -50,8 +59,15 @@ public interface PacienteRepository extends JpaRepository<PacienteEntity, Long> 
 			      and a2.status <> 'CANCELADO'
 			      and a2.dataHoraInicio >= :limite
 			  )
+			  and not exists (
+			    select t2.id
+			    from TratamentoRealizadoEntity t2
+			    where t2.tenantId = :tenantId
+			      and t2.pacienteId = p.id
+			      and t2.dataRealizacao >= :limiteData
+			  )
 			""")
 	List<PacienteEntity> buscarPacientesSemComparecerDesde(@Param("tenantId") Long tenantId,
-			@Param("limite") java.time.LocalDateTime limite);
+			@Param("limite") java.time.LocalDateTime limite, @Param("limiteData") java.time.LocalDate limiteData);
 
 }

@@ -63,7 +63,8 @@ public class WhatsappCampanhaService {
 		LocalDateTime inicioJanelaReenvio = LocalDateTime.now().minusDays(intervaloReenvioDias);
 		LocalDateTime fimJanelaReenvio = LocalDateTime.now();
 
-		List<PacienteEntity> pacientes = pacienteRepository.buscarPacientesSemComparecerDesde(tenantId, limite);
+		List<PacienteEntity> pacientes = pacienteRepository.buscarPacientesSemComparecerDesde(tenantId, limite,
+				limite.toLocalDate());
 
 		for (PacienteEntity paciente : pacientes) {
 			boolean jaRecebeuRecentemente = notificacaoRepository

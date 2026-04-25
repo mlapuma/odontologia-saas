@@ -1,2 +1,125 @@
-<h1>Financeiro</h1>
-<p>Módulo em construção.</p>
+<div class="pagina-financeiro">
+  <div class="cabecalho">
+    <div>
+      <h1>Tratamentos realizados</h1>
+      <p>Registre o historico pago no dia e encontre pacientes sem retorno.</p>
+    </div>
+    <div class="filtro-reativacao">
+      <label>Dias sem comparecer</label>
+      <input type="number" min="1" [(ngModel)]="diasSemComparecer" />
+      <button type="button" (click)="carregarReativacao()">Atualizar</button>
+    </div>
+  </div>
+
+  <div class="mensagens">
+    <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+    <p class="erro" *ngIf="erro">{{ erro }}</p>
+  </div>
+
+  <p *ngIf="carregando">Carregando...</p>
+
+  <div class="grid" *ngIf="!carregando">
+    <section class="card formulario">
+      <h2>Novo registro</h2>
+
+      <div class="campos">
+        <label>
+          Paciente
+          <select [(ngModel)]="form.pacienteId">
+            <option [ngValue]="null">Selecione</option>
+            <option *ngFor="let paciente of pacientes" [ngValue]="paciente.id">{{ paciente.nome }}</option>
+          </select>
+        </label>
+
+        <label>
+          Procedimento cadastrado
+          <select [(ngModel)]="form.procedimentoId">
+            <option [ngValue]="null">Opcional</option>
+            <option *ngFor="let procedimento of procedimentos" [ngValue]="procedimento.id">
+              {{ procedimento.nome }}
+            </option>
+          </select>
+        </label>
+
+        <label>
+          Tratamento descrito no documento
+          <input [(ngModel)]="form.tratamento" placeholder="Ex: Limpeza, canal, restauracao" />
+        </label>
+
+        <label>
+          Valor pago no dia
+          <input type="number" min="0" step="0.01" [(ngModel)]="form.valorPago" />
+        </label>
+
+        <label>
+          Data do tratamento
+          <input type="date" [(ngModel)]="form.dataRealizacao" />
+        </label>
+
+        <label>
+          Observacoes
+          <textarea rows="3" [(ngModel)]="form.observacoes"></textarea>
+        </label>
+      </div>
+
+      <button class="btn-primary" type="button" (click)="salvarTratamento()" [disabled]="salvando">
+        {{ salvando ? 'Salvando...' : 'Registrar tratamento' }}
+      </button>
+    </section>
+
+    <section class="card lista-reativacao">
+      <h2>Pacientes para WhatsApp</h2>
+      <p class="subtitulo">Com tratamento registrado e sem novo retorno no periodo escolhido.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>WhatsApp</th>
+            <th>Ultimo tratamento</th>
+            <th>Total pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let paciente of pacientesReativacao">
+            <td>{{ paciente.nome }}</td>
+            <td>{{ paciente.whatsapp }}</td>
+            <td>{{ paciente.ultimaDataTratamento | date:'dd/MM/yyyy' }}</td>
+            <td>{{ paciente.totalPago | currency:'BRL' }}</td>
+          </tr>
+          <tr *ngIf="pacientesReativacao.length === 0">
+            <td colspan="4">Nenhum paciente encontrado para esse intervalo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <section class="card historico" *ngIf="!carregando">
+    <h2>Historico registrado</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Paciente</th>
+          <th>Tratamento</th>
+          <th>Valor pago</th>
+          <th>Observacoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tratamento of tratamentos">
+          <td>{{ tratamento.dataRealizacao | date:'dd/MM/yyyy' }}</td>
+          <td>{{ nomePaciente(tratamento.pacienteId) }}</td>
+          <td>{{ tratamento.tratamento }}</td>
+          <td>{{ tratamento.valorPago | currency:'BRL' }}</td>
+          <td>{{ tratamento.observacoes }}</td>
+        </tr>
+        <tr *ngIf="tratamentos.length === 0">
+          <td colspan="5">Nenhum tratamento registrado ainda.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
