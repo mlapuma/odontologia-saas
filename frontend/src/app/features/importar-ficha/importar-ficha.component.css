@@ -8,14 +8,15 @@
 
 .cabecalho p {
   margin: 0;
-  color: #6b7280;
+  color: var(--color-muted);
 }
 
 .card {
-  background: #ffffff;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
   padding: 20px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 20px;
 }
 
@@ -33,12 +34,9 @@
 }
 
 input {
-  box-sizing: border-box;
   width: 100%;
   padding: 11px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font: inherit;
+  border-radius: var(--radius);
 }
 
 .acoes {
@@ -49,19 +47,15 @@ input {
 
 button {
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 10px 14px;
   cursor: pointer;
 }
 
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.68;
-}
-
 .btn-primary {
-  background: #2563eb;
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+  color: #1c1204;
+  box-shadow: 0 8px 16px rgba(185, 130, 18, 0.18);
 }
 
 .sucesso,
@@ -69,32 +63,33 @@ button:disabled {
 .aviso {
   margin: 0 0 16px;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 
 .sucesso {
-  color: #166534;
-  background: #dcfce7;
+  color: var(--color-success);
+  background: #e8f7ed;
 }
 
 .erro {
-  color: #991b1b;
-  background: #fee2e2;
+  color: var(--color-danger);
+  background: #fff2ee;
 }
 
 .aviso {
-  color: #92400e;
-  background: #fef3c7;
+  color: #8a5c08;
+  background: var(--color-gold-soft);
 }
 
 .texto-extraido pre {
   max-height: 320px;
   overflow: auto;
   white-space: pre-wrap;
-  color: #374151;
-  background: #f9fafb;
+  color: #4f402b;
+  background: #fffaf0;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
 }
 
 @media (max-width: 800px) {

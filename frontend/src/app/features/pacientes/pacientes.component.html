@@ -1,7 +1,13 @@
 <div class="pagina-pacientes">
     <div class="cabecalho">
-        <h1>Pacientes</h1>
-        <p>Cadastro e gestão de pacientes da clínica.</p>
+        <div>
+            <h1>Pacientes</h1>
+            <p>Cadastro e gestão de pacientes da clínica.</p>
+        </div>
+
+        <button class="btn-primary" type="button" (click)="novo()" *ngIf="!exibindoFormulario">
+            Novo paciente
+        </button>
     </div>
 
     <div class="mensagens">
@@ -9,54 +15,60 @@
         <p class="erro" *ngIf="erro">{{ erro }}</p>
     </div>
 
-    <div class="grid">
-        <section class="card formulario">
-            <h2>{{ editando ? 'Editar paciente' : 'Novo paciente' }}</h2>
+    <section class="card formulario" *ngIf="exibindoFormulario">
+        <div class="cabecalho-formulario">
+            <div>
+                <h2>{{ editando ? 'Editar paciente' : 'Novo paciente' }}</h2>
+                <p>{{ editando ? 'Atualize os dados cadastrais.' : 'Preencha os dados principais do paciente.' }}</p>
+            </div>
+            <button class="btn-secondary" type="button" (click)="cancelar()">Voltar para lista</button>
+        </div>
 
-            <div class="campos">
-                <input [(ngModel)]="pacienteForm.nome" placeholder="Nome" />
-                <input [(ngModel)]="pacienteForm.cpf" placeholder="CPF" />
-                <input [(ngModel)]="pacienteForm.telefone" placeholder="Telefone" />
-                <input [(ngModel)]="pacienteForm.whatsapp" placeholder="WhatsApp" />
-                <input [(ngModel)]="pacienteForm.email" placeholder="E-mail" />
-                <input [(ngModel)]="pacienteForm.dataNascimento" type="date" placeholder="Data de nascimento" />
-                <input [(ngModel)]="pacienteForm.endereco" placeholder="Endereço" />
-                <input [(ngModel)]="pacienteForm.numero" placeholder="Número" />
-                <input [(ngModel)]="pacienteForm.complemento" placeholder="Complemento" />
-                <input [(ngModel)]="pacienteForm.bairro" placeholder="Bairro" />
-                <input [(ngModel)]="pacienteForm.cep" placeholder="CEP" />
-                <input [(ngModel)]="pacienteForm.cidade" placeholder="Cidade" />
-                <input [(ngModel)]="pacienteForm.uf" placeholder="UF" maxlength="2" />
+        <div class="campos">
+            <input [(ngModel)]="pacienteForm.nome" placeholder="Nome" />
+            <input [(ngModel)]="pacienteForm.cpf" placeholder="CPF" />
+            <input [(ngModel)]="pacienteForm.telefone" placeholder="Telefone" />
+            <input [(ngModel)]="pacienteForm.whatsapp" placeholder="WhatsApp" />
+            <input [(ngModel)]="pacienteForm.email" placeholder="E-mail" />
+            <input [(ngModel)]="pacienteForm.dataNascimento" type="date" placeholder="Data de nascimento" />
+            <input [(ngModel)]="pacienteForm.endereco" placeholder="Endereço" />
+            <input [(ngModel)]="pacienteForm.numero" placeholder="Número" />
+            <input [(ngModel)]="pacienteForm.complemento" placeholder="Complemento" />
+            <input [(ngModel)]="pacienteForm.bairro" placeholder="Bairro" />
+            <input [(ngModel)]="pacienteForm.cep" placeholder="CEP" />
+            <input [(ngModel)]="pacienteForm.cidade" placeholder="Cidade" />
+            <input [(ngModel)]="pacienteForm.uf" placeholder="UF" maxlength="2" />
+        </div>
+
+        <div class="acoes-form">
+            <button class="btn-primary" (click)="salvar()">
+                {{ editando ? 'Atualizar paciente' : 'Salvar paciente' }}
+            </button>
+            <button class="btn-secondary" (click)="cancelar()">
+                Cancelar
+            </button>
+        </div>
+    </section>
+
+    <section class="card lista" *ngIf="!exibindoFormulario">
+        <div class="cabecalho-lista">
+            <div>
+                <h2>Lista de pacientes</h2>
+                <p>{{ pacientesFiltrados.length }} de {{ pacientes.length }} pacientes</p>
             </div>
 
-            <div class="acoes-form">
-                <button class="btn-primary" (click)="salvar()">
-                    {{ editando ? 'Atualizar' : 'Salvar' }}
+            <div class="filtro-lista">
+                <input [(ngModel)]="filtro" placeholder="Buscar por nome, CPF, telefone, WhatsApp ou cidade" />
+                <button class="btn-secondary" type="button" (click)="limparFiltro()" *ngIf="filtro">
+                    Limpar
                 </button>
-                <button class="btn-secondary" (click)="cancelar()">
-                    Cancelar
-                </button>
             </div>
-        </section>
+        </div>
 
-        <section class="card lista">
-            <div class="cabecalho-lista">
-                <div>
-                    <h2>Lista de Pacientes</h2>
-                    <p>{{ pacientesFiltrados.length }} de {{ pacientes.length }} pacientes</p>
-                </div>
+        <p *ngIf="carregando">Carregando...</p>
 
-                <div class="filtro-lista">
-                    <input [(ngModel)]="filtro" placeholder="Buscar por nome, CPF, telefone, WhatsApp ou cidade" />
-                    <button class="btn-secondary" type="button" (click)="limparFiltro()" *ngIf="filtro">
-                        Limpar
-                    </button>
-                </div>
-            </div>
-
-            <p *ngIf="carregando">Carregando...</p>
-
-            <table *ngIf="!carregando">
+        <div class="tabela-scroll" *ngIf="!carregando">
+            <table>
                 <thead>
                     <tr>
                         <th>Nome</th>
@@ -86,6 +98,6 @@
                     </tr>
                 </tbody>
             </table>
-        </section>
-    </div>
+        </div>
+    </section>
 </div>

@@ -17,6 +17,7 @@ export class PacientesComponent implements OnInit {
   pacientes: Paciente[] = [];
   pacienteForm: Paciente = this.novoPaciente();
   editando = false;
+  exibindoFormulario = false;
   carregando = false;
   mensagem = '';
   erro = '';
@@ -80,6 +81,15 @@ export class PacientesComponent implements OnInit {
   editar(paciente: Paciente): void {
     this.pacienteForm = { ...paciente };
     this.editando = true;
+    this.exibindoFormulario = true;
+    this.mensagem = '';
+    this.erro = '';
+  }
+
+  novo(): void {
+    this.pacienteForm = this.novoPaciente();
+    this.editando = false;
+    this.exibindoFormulario = true;
     this.mensagem = '';
     this.erro = '';
   }
@@ -108,6 +118,7 @@ export class PacientesComponent implements OnInit {
   cancelar(): void {
     this.pacienteForm = this.novoPaciente();
     this.editando = false;
+    this.exibindoFormulario = false;
   }
 
   limparFiltro(): void {

@@ -3,39 +3,66 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #eef2ff;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(215, 165, 47, 0.24), transparent 32%),
+    linear-gradient(135deg, #17130d 0%, #332515 48%, #f7f3ea 48%, #f7f3ea 100%);
 }
 
 .login-box {
-  background: #fff;
-  padding: 32px;
-  border-radius: 16px;
-  width: 360px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  width: min(430px, 100%);
+  padding: 34px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(215, 165, 47, 0.28);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+.marca-login {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.marca-login img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  padding: 6px;
+  background: var(--color-dark);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(215, 165, 47, 0.2);
+}
+
+.marca-login span {
+  color: var(--color-gold-strong);
+  font-weight: 700;
+}
+
+.marca-login h2 {
+  margin: 2px 0 0;
 }
 
 input {
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font: inherit;
+  padding: 13px 14px;
+  border-radius: var(--radius);
 }
 
 button {
-  padding: 12px;
+  padding: 13px 14px;
   border: none;
-  border-radius: 8px;
-  background: #2563eb;
-  color: #fff;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+  color: #1c1204;
   cursor: pointer;
-  font: inherit;
-  font-weight: 600;
+  box-shadow: 0 8px 18px rgba(185, 130, 18, 0.22);
 }
 
 .erro {
-  color: #dc2626;
+  color: var(--color-danger);
   margin: 0;
 }

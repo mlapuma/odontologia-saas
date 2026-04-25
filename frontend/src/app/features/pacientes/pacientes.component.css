@@ -1,168 +1,160 @@
-.cabecalho {
-  margin-bottom: 20px;
-
-  h1 {
-    margin: 0 0 8px;
-  }
-
-  p {
-    margin: 0;
-    color: #6b7280;
-  }
-}
-
-.mensagens {
-  margin-bottom: 16px;
-
-  .sucesso {
-    color: #166534;
-    background: #dcfce7;
-    padding: 10px 12px;
-    border-radius: 8px;
-  }
-
-  .erro {
-    color: #991b1b;
-    background: #fee2e2;
-    padding: 10px 12px;
-    border-radius: 8px;
-  }
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 20px;
-}
-
-.card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-}
-
-.formulario h2,
-.lista h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-
+.cabecalho,
+.cabecalho-formulario,
 .cabecalho-lista {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
-
-  h2 {
-    margin-bottom: 6px;
-  }
-
-  p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 14px;
-  }
+  margin-bottom: 20px;
 }
 
-.filtro-lista {
-  display: flex;
-  gap: 8px;
-  width: min(520px, 100%);
+.cabecalho p,
+.cabecalho-formulario p,
+.cabecalho-lista p {
+  margin: 0;
+  color: var(--color-muted);
+}
 
-  input {
-    flex: 1;
-    min-width: 220px;
-    padding: 11px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-  }
+.mensagens {
+  margin-bottom: 16px;
+}
+
+.sucesso,
+.erro {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+}
+
+.sucesso {
+  color: var(--color-success);
+  background: #e8f7ed;
+}
+
+.erro {
+  color: var(--color-danger);
+  background: #fff2ee;
+}
+
+.card {
+  min-width: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.formulario {
+  max-width: 960px;
 }
 
 .campos {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
 
-  input {
-    padding: 11px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-  }
+.campos input,
+.filtro-lista input {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  border-radius: var(--radius);
+}
+
+.acoes-form,
+.filtro-lista,
+.acoes-tabela {
+  display: flex;
+  gap: 10px;
 }
 
 .acoes-form {
-  display: flex;
-  gap: 10px;
   margin-top: 16px;
 }
 
 button {
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 10px 14px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .btn-primary {
-  background: #2563eb;
-  color: #fff;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+  color: #1c1204;
+  box-shadow: 0 8px 16px rgba(185, 130, 18, 0.18);
 }
 
 .btn-secondary {
-  background: #e5e7eb;
-  color: #111827;
+  background: var(--color-gold-soft);
+  color: #5d3f08;
+}
+
+.filtro-lista {
+  width: min(520px, 100%);
+}
+
+.filtro-lista input {
+  flex: 1;
+}
+
+.tabela-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
 }
 
 table {
   width: 100%;
+  min-width: 900px;
   border-collapse: collapse;
-}
-
-thead {
-  background: #f3f4f6;
 }
 
 th,
 td {
   padding: 12px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
   text-align: left;
   font-size: 14px;
+  vertical-align: middle;
 }
 
-.acoes-tabela {
-  display: flex;
-  gap: 8px;
+th:nth-child(7),
+td:nth-child(7) {
+  width: 164px;
+  white-space: nowrap;
 }
 
 .btn-editar {
-  background: #f59e0b;
-  color: #fff;
+  background: #fbf4e5;
+  color: #7b560c;
 }
 
 .btn-excluir {
-  background: #dc2626;
-  color: #fff;
+  background: #fff2ee;
+  color: var(--color-danger);
 }
 
-@media (max-width: 1000px) {
-  .grid {
+@media (max-width: 760px) {
+  .cabecalho,
+  .cabecalho-formulario,
+  .cabecalho-lista,
+  .filtro-lista,
+  .acoes-form {
+    flex-direction: column;
+  }
+
+  .campos {
     grid-template-columns: 1fr;
   }
 
-  .cabecalho-lista,
-  .filtro-lista {
-    flex-direction: column;
-  }
-
-  .filtro-lista input {
-    min-width: 0;
+  .cabecalho button,
+  .cabecalho-formulario button,
+  .filtro-lista button,
+  .acoes-form button {
     width: 100%;
-  }
-
-  .acoes-tabela {
-    flex-direction: column;
   }
 }

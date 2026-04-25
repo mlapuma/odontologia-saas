@@ -1,3 +1,21 @@
+:root {
+  --color-bg: #f7f3ea;
+  --color-surface: #ffffff;
+  --color-surface-soft: #fffaf0;
+  --color-text: #1c1710;
+  --color-muted: #6f6454;
+  --color-border: #e8deca;
+  --color-gold: #d7a52f;
+  --color-gold-strong: #b98212;
+  --color-gold-soft: #fff1c7;
+  --color-dark: #17130d;
+  --color-danger: #b42318;
+  --color-success: #166534;
+  --shadow-sm: 0 8px 20px rgba(40, 30, 14, 0.08);
+  --shadow-md: 0 18px 44px rgba(40, 30, 14, 0.12);
+  --radius: 8px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -9,8 +27,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 15px;
   line-height: 1.45;
-  color: #111827;
-  background: #f5f7fb;
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 h1 {
@@ -18,7 +36,7 @@ h1 {
   font-size: 28px;
   line-height: 1.2;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
 }
 
 h2 {
@@ -26,7 +44,7 @@ h2 {
   font-size: 20px;
   line-height: 1.25;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
 }
 
 h3 {
@@ -45,6 +63,47 @@ button {
   font: inherit;
 }
 
+input,
+select,
+textarea {
+  color: var(--color-text);
+  background: #fffdf8;
+  border: 1px solid var(--color-border);
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(215, 165, 47, 0.18);
+  background: #ffffff;
+}
+
 button {
   font-weight: 600;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+table {
+  background: var(--color-surface);
+}
+
+thead {
+  background: #fbf4e5;
+}
+
+th {
+  color: #55442a;
+  font-weight: 700;
 }
