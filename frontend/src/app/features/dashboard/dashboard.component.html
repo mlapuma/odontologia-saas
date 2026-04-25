@@ -1,33 +1,95 @@
-<h1>Dashboard da Clínica</h1>
-
-<div class="grid" *ngIf="resumo">
-  <div class="card">
-    <h3>Pacientes</h3>
-    <p>{{ resumo.pacientesTotal }}</p>
+<div class="dashboard-page">
+  <div class="cabecalho">
+    <div>
+      <h1>Dashboard da Clínica</h1>
+      <p>Resumo rápido para acompanhar a rotina de hoje e os retornos importantes.</p>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>Pacientes ativos</h3>
-    <p>{{ resumo.pacientesAtivos }}</p>
-  </div>
+  <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="carregando" *ngIf="carregando">Carregando...</p>
 
-  <div class="card">
-    <h3>Agendamentos hoje</h3>
-    <p>{{ resumo.agendamentosHoje }}</p>
-  </div>
+  <ng-container *ngIf="resumo && !carregando">
+    <div class="grid indicadores">
+      <div class="card destaque">
+        <span>Agendamentos hoje</span>
+        <strong>{{ resumo.agendamentosHoje }}</strong>
+      </div>
 
-  <div class="card">
-    <h3>Confirmadas hoje</h3>
-    <p>{{ resumo.consultasConfirmadasHoje }}</p>
-  </div>
+      <div class="card">
+        <span>Confirmadas hoje</span>
+        <strong>{{ resumo.consultasConfirmadasHoje }}</strong>
+      </div>
 
-  <div class="card">
-    <h3>Canceladas hoje</h3>
-    <p>{{ resumo.consultasCanceladasHoje }}</p>
-  </div>
+      <div class="card">
+        <span>Faturamento previsto</span>
+        <strong>{{ resumo.faturamentoPrevistoHoje | currency:'BRL' }}</strong>
+      </div>
 
-  <div class="card">
-    <h3>Faturamento previsto</h3>
-    <p>{{ resumo.faturamentoPrevistoHoje }}</p>
-  </div>
+      <div class="card">
+        <span>Recebido no mês</span>
+        <strong>{{ resumo.valorRecebidoMes | currency:'BRL' }}</strong>
+      </div>
+
+      <div class="card">
+        <span>Tratamentos no mês</span>
+        <strong>{{ resumo.tratamentosRealizadosMes }}</strong>
+      </div>
+
+      <div class="card alerta">
+        <span>Pacientes sem retorno</span>
+        <strong>{{ resumo.pacientesSemRetorno }}</strong>
+      </div>
+
+      <div class="card">
+        <span>WhatsApp enviados hoje</span>
+        <strong>{{ resumo.mensagensWhatsappHoje }}</strong>
+      </div>
+
+      <div class="card">
+        <span>Pacientes ativos</span>
+        <strong>{{ resumo.pacientesAtivos }} / {{ resumo.pacientesTotal }}</strong>
+      </div>
+    </div>
+
+    <div class="painel-grid">
+      <section class="painel">
+        <div class="painel-cabecalho">
+          <h2>Próximos agendamentos</h2>
+          <span>Agenda futura</span>
+        </div>
+
+        <div class="lista-vazia" *ngIf="resumo.proximosAgendamentos.length === 0">
+          Nenhum agendamento futuro encontrado.
+        </div>
+
+        <div class="linha-info" *ngFor="let agendamento of resumo.proximosAgendamentos">
+          <div>
+            <strong>{{ agendamento.pacienteNome }}</strong>
+            <span>{{ agendamento.dataHoraInicio | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <em>{{ agendamento.status }}</em>
+        </div>
+      </section>
+
+      <section class="painel">
+        <div class="painel-cabecalho">
+          <h2>Pacientes para reativar</h2>
+          <span>Mais de 180 dias</span>
+        </div>
+
+        <div class="lista-vazia" *ngIf="resumo.pacientesParaReativar.length === 0">
+          Nenhum paciente pendente de reativação.
+        </div>
+
+        <div class="linha-info" *ngFor="let paciente of resumo.pacientesParaReativar">
+          <div>
+            <strong>{{ paciente.nome }}</strong>
+            <span>Último tratamento: {{ paciente.ultimaDataTratamento | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <em>{{ paciente.whatsapp }}</em>
+        </div>
+      </section>
+    </div>
+  </ng-container>
 </div>

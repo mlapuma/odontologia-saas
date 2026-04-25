@@ -19,6 +19,9 @@ public class DashboardService {
 	public DashboardResumoDTO obterResumo(Long tenantId) {
 
 		LocalDate hoje = LocalDate.now();
+		LocalDate inicioMes = hoje.withDayOfMonth(1);
+		LocalDate fimMes = hoje.withDayOfMonth(hoje.lengthOfMonth());
+		LocalDate limiteReativacao = hoje.minusDays(180);
 
 		LocalDateTime inicio = hoje.atStartOfDay();
 		LocalDateTime fim = hoje.atTime(23, 59, 59);
@@ -35,6 +38,12 @@ public class DashboardService {
 		dto.setConsultasCanceladasHoje(repository.consultasCanceladasHoje(tenantId, inicio, fim));
 
 		dto.setFaturamentoPrevistoHoje(repository.faturamentoPrevistoHoje(tenantId, inicio, fim));
+		dto.setMensagensWhatsappHoje(repository.mensagensWhatsappHoje(tenantId, inicio, fim));
+		dto.setTratamentosRealizadosMes(repository.tratamentosRealizadosMes(tenantId, inicioMes, fimMes));
+		dto.setValorRecebidoMes(repository.valorRecebidoMes(tenantId, inicioMes, fimMes));
+		dto.setPacientesSemRetorno(repository.pacientesSemRetorno(tenantId, limiteReativacao));
+		dto.setProximosAgendamentos(repository.proximosAgendamentos(tenantId, LocalDateTime.now()));
+		dto.setPacientesParaReativar(repository.pacientesParaReativar(tenantId, limiteReativacao));
 
 		return dto;
 	}
