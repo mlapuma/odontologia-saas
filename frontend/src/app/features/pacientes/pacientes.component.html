@@ -40,7 +40,19 @@
         </section>
 
         <section class="card lista">
-            <h2>Lista de Pacientes</h2>
+            <div class="cabecalho-lista">
+                <div>
+                    <h2>Lista de Pacientes</h2>
+                    <p>{{ pacientesFiltrados.length }} de {{ pacientes.length }} pacientes</p>
+                </div>
+
+                <div class="filtro-lista">
+                    <input [(ngModel)]="filtro" placeholder="Buscar por nome, CPF, telefone, WhatsApp ou cidade" />
+                    <button class="btn-secondary" type="button" (click)="limparFiltro()" *ngIf="filtro">
+                        Limpar
+                    </button>
+                </div>
+            </div>
 
             <p *ngIf="carregando">Carregando...</p>
 
@@ -57,7 +69,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let paciente of pacientes">
+                    <tr *ngFor="let paciente of pacientesFiltrados">
                         <td>{{ paciente.nome }}</td>
                         <td>{{ paciente.telefone }}</td>
                         <td>{{ paciente.whatsapp }}</td>
@@ -68,6 +80,9 @@
                             <button class="btn-editar" (click)="editar(paciente)">Editar</button>
                             <button class="btn-excluir" (click)="excluir(paciente.id)">Excluir</button>
                         </td>
+                    </tr>
+                    <tr *ngIf="pacientesFiltrados.length === 0">
+                        <td colspan="7">Nenhum paciente encontrado para esse filtro.</td>
                     </tr>
                 </tbody>
             </table>

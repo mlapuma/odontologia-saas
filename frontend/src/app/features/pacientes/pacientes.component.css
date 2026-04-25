@@ -52,6 +52,38 @@
   margin-bottom: 16px;
 }
 
+.cabecalho-lista {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  h2 {
+    margin-bottom: 6px;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+.filtro-lista {
+  display: flex;
+  gap: 8px;
+  width: min(520px, 100%);
+
+  input {
+    flex: 1;
+    min-width: 220px;
+    padding: 11px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+  }
+}
+
 .campos {
   display: flex;
   flex-direction: column;
@@ -122,6 +154,16 @@ td {
 @media (max-width: 1000px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .cabecalho-lista,
+  .filtro-lista {
+    flex-direction: column;
+  }
+
+  .filtro-lista input {
+    min-width: 0;
+    width: 100%;
   }
 
   .acoes-tabela {

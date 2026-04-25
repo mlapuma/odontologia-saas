@@ -20,6 +20,7 @@ export class PacientesComponent implements OnInit {
   carregando = false;
   mensagem = '';
   erro = '';
+  filtro = '';
 
   constructor(private pacienteService: PacienteService) { }
 
@@ -107,6 +108,37 @@ export class PacientesComponent implements OnInit {
   cancelar(): void {
     this.pacienteForm = this.novoPaciente();
     this.editando = false;
+  }
+
+  limparFiltro(): void {
+    this.filtro = '';
+  }
+
+  get pacientesFiltrados(): Paciente[] {
+    const termo = this.normalizarBusca(this.filtro);
+    if (!termo) {
+      return this.pacientes;
+    }
+
+    return this.pacientes.filter(paciente => this.normalizarBusca([
+      paciente.nome,
+      paciente.cpf,
+      paciente.telefone,
+      paciente.whatsapp,
+      paciente.email,
+      paciente.endereco,
+      paciente.bairro,
+      paciente.cidade,
+      paciente.uf
+    ].join(' ')).includes(termo));
+  }
+
+  private normalizarBusca(valor?: string): string {
+    return (valor || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
   }
 
   private novoPaciente(): Paciente {
