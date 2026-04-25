@@ -1,7 +1,7 @@
 <div class="pagina-pacientes">
     <div class="cabecalho">
         <h1>Pacientes</h1>
-        <p>Cadastro e gestao de pacientes da clinica.</p>
+        <p>Cadastro e gestão de pacientes da clínica.</p>
     </div>
 
     <div class="mensagens">
@@ -11,7 +11,7 @@
 
     <div class="grid">
         <section class="card formulario">
-            <h2>{{ editando ? 'Editar Paciente' : 'Novo Paciente' }}</h2>
+            <h2>{{ editando ? 'Editar paciente' : 'Novo paciente' }}</h2>
 
             <div class="campos">
                 <input [(ngModel)]="pacienteForm.nome" placeholder="Nome" />
@@ -20,8 +20,8 @@
                 <input [(ngModel)]="pacienteForm.whatsapp" placeholder="WhatsApp" />
                 <input [(ngModel)]="pacienteForm.email" placeholder="E-mail" />
                 <input [(ngModel)]="pacienteForm.dataNascimento" type="date" placeholder="Data de nascimento" />
-                <input [(ngModel)]="pacienteForm.endereco" placeholder="Endereco" />
-                <input [(ngModel)]="pacienteForm.numero" placeholder="Numero" />
+                <input [(ngModel)]="pacienteForm.endereco" placeholder="Endereço" />
+                <input [(ngModel)]="pacienteForm.numero" placeholder="Número" />
                 <input [(ngModel)]="pacienteForm.complemento" placeholder="Complemento" />
                 <input [(ngModel)]="pacienteForm.bairro" placeholder="Bairro" />
                 <input [(ngModel)]="pacienteForm.cep" placeholder="CEP" />
@@ -63,9 +63,9 @@
                         <th>Telefone</th>
                         <th>WhatsApp</th>
                         <th>E-mail</th>
-                        <th>Endereco</th>
+                        <th>Endereço</th>
                         <th>Cidade</th>
-                        <th>Acoes</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>

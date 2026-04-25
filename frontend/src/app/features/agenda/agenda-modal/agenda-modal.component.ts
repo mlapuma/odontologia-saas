@@ -50,13 +50,13 @@ export class AgendaModalComponent implements OnChanges {
     this.erro = '';
 
     if (!this.form.pacienteId || !this.form.profissionalId || !this.form.dataHoraInicio || !this.form.procedimentoId) {
-      this.erro = 'Preencha paciente, profissional, horario e procedimento.';
+      this.erro = 'Preencha paciente, profissional, horário e procedimento.';
       return;
     }
 
     const tenantId = Number(localStorage.getItem('tenantId'));
     if (!tenantId) {
-      this.erro = 'Nao foi possivel identificar a clinica logada.';
+      this.erro = 'Não foi possível identificar a clínica logada.';
       return;
     }
 

@@ -22,6 +22,42 @@ export class FinanceiroComponent implements OnInit {
   procedimentos: Procedimento[] = [];
   tratamentos: TratamentoRealizado[] = [];
   pacientesReativacao: PacienteReativacao[] = [];
+  tratamentosOdontologicos = [
+    'Avaliação odontológica',
+    'Profilaxia / limpeza',
+    'Aplicação de flúor',
+    'Raspagem periodontal',
+    'Tratamento periodontal',
+    'Clareamento dental',
+    'Restauração em resina',
+    'Restauração em amálgama',
+    'Tratamento de canal',
+    'Retratamento de canal',
+    'Extração dentária',
+    'Extração de siso',
+    'Cirurgia oral menor',
+    'Implante dentário',
+    'Protocolo sobre implantes',
+    'Próteses fixas',
+    'Prótese removível',
+    'Prótese total',
+    'Coroa dentária',
+    'Lente de contato dental',
+    'Faceta em resina',
+    'Faceta em porcelana',
+    'Aparelho ortodôntico',
+    'Manutenção ortodôntica',
+    'Alinhadores transparentes',
+    'Tratamento de bruxismo',
+    'Placa miorrelaxante',
+    'Odontopediatria',
+    'Selante dental',
+    'Radiografia odontológica',
+    'Enxerto ósseo',
+    'Gengivoplastia',
+    'Frenectomia',
+    'Urgência odontológica'
+  ];
 
   form = this.novoForm();
   diasSemComparecer = 180;
@@ -102,6 +138,34 @@ export class FinanceiroComponent implements OnInit {
     return this.procedimentos.find(item => item.id === Number(this.form.procedimentoId))?.nome || '';
   }
 
+  get tratamentosParaSelecao(): string[] {
+    const nomesProcedimentos = this.procedimentos.map(item => item.nome);
+    return Array.from(new Set([...this.tratamentosOdontologicos, ...nomesProcedimentos]))
+      .sort((a, b) => a.localeCompare(b));
+  }
+
+  selecionarProcedimento(valor: string): void {
+    this.form.procedimentoSelecao = valor;
+
+    if (!valor) {
+      this.form.procedimentoId = null;
+      return;
+    }
+
+    if (valor.startsWith('procedimento-')) {
+      const procedimentoId = Number(valor.replace('procedimento-', ''));
+      const procedimento = this.procedimentos.find(item => item.id === procedimentoId);
+      this.form.procedimentoId = procedimentoId;
+      this.form.tratamento = procedimento?.nome || '';
+      return;
+    }
+
+    if (valor.startsWith('padrao-')) {
+      this.form.procedimentoId = null;
+      this.form.tratamento = valor.replace('padrao-', '');
+    }
+  }
+
   private carregarDados(): void {
     this.carregando = true;
     forkJoin({
@@ -134,6 +198,7 @@ export class FinanceiroComponent implements OnInit {
     return {
       pacienteId: null as number | null,
       procedimentoId: null as number | null,
+      procedimentoSelecao: '',
       tratamento: '',
       valorPago: 0,
       dataRealizacao: this.hoje(),

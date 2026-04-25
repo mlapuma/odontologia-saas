@@ -1,7 +1,3 @@
-.pagina-importacao {
-  font-family: Arial, sans-serif;
-}
-
 .cabecalho {
   margin-bottom: 20px;
 }
@@ -42,6 +38,7 @@ input {
   padding: 11px 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
+  font: inherit;
 }
 
 .acoes {

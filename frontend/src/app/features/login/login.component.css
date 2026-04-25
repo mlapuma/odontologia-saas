@@ -4,7 +4,6 @@
   align-items: center;
   justify-content: center;
   background: #eef2ff;
-  font-family: Arial, sans-serif;
 }
 
 .login-box {
@@ -22,6 +21,7 @@ input {
   padding: 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
+  font: inherit;
 }
 
 button {
@@ -31,6 +31,8 @@ button {
   background: #2563eb;
   color: #fff;
   cursor: pointer;
+  font: inherit;
+  font-weight: 600;
 }
 
 .erro {

@@ -68,7 +68,7 @@ export class ImportarFichaComponent {
     this.erro = '';
 
     if (!this.paciente.nome || this.paciente.nome.trim() === '') {
-      this.erro = 'Nome e obrigatorio antes de cadastrar.';
+      this.erro = 'Nome é obrigatório antes de cadastrar.';
       return;
     }
 

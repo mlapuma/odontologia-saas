@@ -3,7 +3,7 @@
     <header class="modal-header">
       <div>
         <h2 id="agenda-modal-title">{{ modoDetalhe ? 'Detalhes do agendamento' : 'Novo agendamento' }}</h2>
-        <p>{{ modoDetalhe ? 'Consulta selecionada na agenda.' : 'Cadastro rapido a partir do horario selecionado.' }}</p>
+        <p>{{ modoDetalhe ? 'Consulta selecionada na agenda.' : 'Cadastro rápido a partir do horário selecionado.' }}</p>
       </div>
       <button class="btn-icon" type="button" aria-label="Fechar" (click)="fecharModal()">x</button>
     </header>
@@ -26,7 +26,7 @@
       </label>
 
       <label>
-        Horario
+        Horário
         <input [(ngModel)]="form.dataHoraInicio" name="dataHoraInicio" type="datetime-local" [readonly]="modoDetalhe" />
       </label>
 
@@ -42,18 +42,18 @@
         </label>
 
         <label>
-          Qtde
+          Quantidade
           <input [(ngModel)]="form.quantidade" name="quantidade" type="number" min="1" [readonly]="modoDetalhe" />
         </label>
       </div>
 
       <label *ngIf="!modoDetalhe">
-        Observacoes
+        Observações
         <textarea [(ngModel)]="form.observacoes" name="observacoes" rows="3"></textarea>
       </label>
 
       <div class="resumo" *ngIf="procedimentoSelecionado || detalhe">
-        <span>Duracao: {{ detalhe?.duracaoTotalMinutos || duracaoEstimada }} min</span>
+        <span>Duração: {{ detalhe?.duracaoTotalMinutos || duracaoEstimada }} min</span>
         <span>Valor: {{ (detalhe?.valorTotal || valorEstimado) | currency:'BRL' }}</span>
         <span *ngIf="detalhe">Status: {{ detalhe.status }}</span>
       </div>

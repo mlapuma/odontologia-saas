@@ -1,13 +1,11 @@
 h1 {
   margin-bottom: 24px;
-  font-family: Arial, sans-serif;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
-  font-family: Arial, sans-serif;
 }
 
 .card {

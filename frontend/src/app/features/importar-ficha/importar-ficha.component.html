@@ -1,7 +1,7 @@
 <div class="pagina-importacao">
   <div class="cabecalho">
     <h1>Importar ficha</h1>
-    <p>Leia a ficha escaneada, revise os campos e confirme o cadastro.</p>
+    <p>Leia somente a identificação do paciente, revise os campos e confirme o cadastro.</p>
   </div>
 
   <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
@@ -16,7 +16,7 @@
   </section>
 
   <section class="card formulario" *ngIf="previewGerado">
-    <h2>Identificacao do paciente</h2>
+    <h2>Identificação do paciente</h2>
 
     <div class="campos">
       <input [(ngModel)]="paciente.nome" placeholder="Nome" />
@@ -25,8 +25,8 @@
       <input [(ngModel)]="paciente.whatsapp" placeholder="WhatsApp" />
       <input [(ngModel)]="paciente.email" placeholder="E-mail" />
       <input [(ngModel)]="paciente.dataNascimento" type="date" placeholder="Data de nascimento" />
-      <input [(ngModel)]="paciente.endereco" placeholder="Endereco" />
-      <input [(ngModel)]="paciente.numero" placeholder="Numero" />
+      <input [(ngModel)]="paciente.endereco" placeholder="Endereço" />
+      <input [(ngModel)]="paciente.numero" placeholder="Número" />
       <input [(ngModel)]="paciente.complemento" placeholder="Complemento" />
       <input [(ngModel)]="paciente.bairro" placeholder="Bairro" />
       <input [(ngModel)]="paciente.cep" placeholder="CEP" />
@@ -42,7 +42,7 @@
   </section>
 
   <section class="card texto-extraido" *ngIf="textoExtraido">
-    <h2>Texto extraido</h2>
+    <h2>Identificação lida</h2>
     <pre>{{ textoExtraido }}</pre>
   </section>
 </div>
