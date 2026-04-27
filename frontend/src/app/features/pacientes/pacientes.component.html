@@ -58,7 +58,7 @@
             </div>
 
             <div class="filtro-lista">
-                <input [(ngModel)]="filtro" placeholder="Buscar por nome, CPF, telefone, WhatsApp ou cidade" />
+                <input [(ngModel)]="filtro" (ngModelChange)="aoFiltrar()" placeholder="Buscar por nome, CPF, telefone, WhatsApp ou cidade" />
                 <button class="btn-secondary" type="button" (click)="limparFiltro()" *ngIf="filtro">
                     Limpar
                 </button>
@@ -81,7 +81,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let paciente of pacientesFiltrados">
+                    <tr *ngFor="let paciente of pacientesPaginados">
                         <td>{{ paciente.nome }}</td>
                         <td>{{ paciente.telefone }}</td>
                         <td>{{ paciente.whatsapp }}</td>
@@ -98,6 +98,40 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="paginacao" *ngIf="!carregando && pacientesFiltrados.length > 0">
+            <div class="paginacao-resumo">
+                Exibindo {{ primeiroItemExibido }} a {{ ultimoItemExibido }} de {{ pacientesFiltrados.length }} pacientes
+            </div>
+
+            <div class="paginacao-controles">
+                <label>
+                    Itens por página
+                    <select [ngModel]="itensPorPagina" (ngModelChange)="alterarItensPorPagina($event)">
+                        <option [ngValue]="5">5</option>
+                        <option [ngValue]="10">10</option>
+                        <option [ngValue]="20">20</option>
+                        <option [ngValue]="50">50</option>
+                    </select>
+                </label>
+
+                <div class="botoes-pagina">
+                    <button class="btn-secondary" type="button" (click)="irParaPagina(paginaAtual - 1)" [disabled]="paginaAtual === 1">
+                        Anterior
+                    </button>
+                    <button
+                        type="button"
+                        *ngFor="let pagina of paginas"
+                        [class.pagina-ativa]="pagina === paginaAtual"
+                        (click)="irParaPagina(pagina)">
+                        {{ pagina }}
+                    </button>
+                    <button class="btn-secondary" type="button" (click)="irParaPagina(paginaAtual + 1)" [disabled]="paginaAtual === totalPaginas">
+                        Próxima
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 </div>

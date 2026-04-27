@@ -48,6 +48,7 @@
 }
 
 input {
+  width: 100%;
   padding: 13px 14px;
   border-radius: var(--radius);
 }
@@ -65,4 +66,27 @@ button {
 .erro {
   color: var(--color-danger);
   margin: 0;
+}
+
+@media (max-width: 520px) {
+  .login-page {
+    align-items: flex-start;
+    padding: 16px;
+    background:
+      radial-gradient(circle at top, rgba(215, 165, 47, 0.22), transparent 34%),
+      linear-gradient(180deg, #17130d 0%, #332515 210px, #f7f3ea 210px);
+  }
+
+  .login-box {
+    padding: 22px;
+  }
+
+  .marca-login {
+    align-items: flex-start;
+  }
+
+  .marca-login img {
+    width: 58px;
+    height: 58px;
+  }
 }

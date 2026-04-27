@@ -12,6 +12,9 @@
 }
 
 .agenda-card {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -22,6 +25,17 @@
 :host ::ng-deep .fc .fc-toolbar-title {
   color: var(--color-text);
   font-size: 20px;
+}
+
+:host ::ng-deep .fc .fc-toolbar {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+:host ::ng-deep .fc .fc-toolbar-chunk {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 :host ::ng-deep .fc .fc-button-primary {
@@ -59,4 +73,36 @@
 .erro {
   color: var(--color-danger);
   background: #fff2ee;
+}
+
+@media (max-width: 720px) {
+  .agenda-card {
+    padding: 10px;
+  }
+
+  :host ::ng-deep .fc {
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  :host ::ng-deep .fc .fc-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  :host ::ng-deep .fc .fc-toolbar-chunk,
+  :host ::ng-deep .fc .fc-button-group {
+    width: 100%;
+  }
+
+  :host ::ng-deep .fc .fc-button {
+    flex: 1;
+    padding: 7px 8px;
+  }
+
+  :host ::ng-deep .fc .fc-toolbar-title {
+    width: 100%;
+    font-size: 18px;
+    text-align: center;
+  }
 }

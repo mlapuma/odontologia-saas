@@ -86,6 +86,7 @@
       <h2>Pacientes para WhatsApp</h2>
       <p class="subtitulo">Com tratamento registrado e sem novo retorno no período escolhido.</p>
 
+      <div class="tabela-scroll">
       <table>
         <thead>
           <tr>
@@ -107,12 +108,14 @@
           </tr>
         </tbody>
       </table>
+      </div>
     </section>
   </div>
 
   <section class="card historico" *ngIf="!carregando">
     <h2>Histórico registrado</h2>
 
+    <div class="tabela-scroll">
     <table>
       <thead>
         <tr>
@@ -136,5 +139,6 @@
         </tr>
       </tbody>
     </table>
+    </div>
   </section>
 </div>

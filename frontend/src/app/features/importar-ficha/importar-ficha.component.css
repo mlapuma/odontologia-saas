@@ -27,6 +27,10 @@
   align-items: center;
 }
 
+.upload input {
+  flex: 1 1 260px;
+}
+
 .campos {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -35,6 +39,7 @@
 
 input {
   width: 100%;
+  min-width: 0;
   padding: 11px 12px;
   border-radius: var(--radius);
 }

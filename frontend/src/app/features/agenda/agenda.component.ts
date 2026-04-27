@@ -29,10 +29,14 @@ export class AgendaComponent {
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    initialView: 'timeGridWeek',
+    initialView: this.visaoInicialAgenda(),
     locale: 'pt-br',
     selectable: true,
     editable: false,
+    height: 'auto',
+    contentHeight: 'auto',
+    expandRows: true,
+    dayMaxEvents: true,
     allDaySlot: false,
     slotMinTime: '08:00:00',
     slotMaxTime: '18:00:00',
@@ -48,7 +52,10 @@ export class AgendaComponent {
       this.carregarEventos(arg);
     },
     select: (arg) => this.novoAgendamento(arg),
-    eventClick: (arg) => this.detalharEvento(arg)
+    eventClick: (arg) => this.detalharEvento(arg),
+    windowResize: (arg) => {
+      arg.view.calendar.changeView(this.visaoInicialAgenda());
+    }
   };
 
   constructor(private agendaService: AgendaService) { }
@@ -120,5 +127,9 @@ export class AgendaComponent {
 
   private doisDigitos(valor: number): string {
     return String(valor).padStart(2, '0');
+  }
+
+  private visaoInicialAgenda(): string {
+    return window.innerWidth <= 720 ? 'timeGridDay' : 'timeGridWeek';
   }
 }

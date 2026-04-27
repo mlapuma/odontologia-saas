@@ -1,8 +1,75 @@
 <div class="dashboard-page">
+  <div class="hero-menu">
+    <div>
+      <span class="eyebrow">Menu principal</span>
+      <h1>Clínica LaCari Odontologia</h1>
+      <p>Escolha uma área para trabalhar ou acompanhe os principais indicadores da clínica.</p>
+    </div>
+    <img src="assets/lacari-icon.png" alt="Clínica LaCari Odontologia" />
+  </div>
+
+  <section class="menu-grid" aria-label="Áreas do sistema">
+    <a class="menu-card" routerLink="/app/pacientes">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="9" cy="8" r="3"></circle>
+          <path d="M3.5 19c.7-3.2 2.8-5 5.5-5s4.8 1.8 5.5 5"></path>
+          <circle cx="17" cy="9" r="2.4"></circle>
+          <path d="M14.8 14.4c2.8.2 4.8 1.8 5.7 4.6"></path>
+        </svg>
+      </span>
+      <strong>Pacientes</strong>
+      <small>Cadastro, busca e atualização de dados.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/importar-ficha">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 3h7l4 4v14H7z"></path>
+          <path d="M14 3v5h5"></path>
+          <path d="M9 13h6"></path>
+          <path d="M9 17h4"></path>
+          <path d="M4 8v10"></path>
+        </svg>
+      </span>
+      <strong>Importar ficha</strong>
+      <small>Leitura da identificação do paciente.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/agenda">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="4" y="5" width="16" height="16" rx="2"></rect>
+          <path d="M8 3v4"></path>
+          <path d="M16 3v4"></path>
+          <path d="M4 10h16"></path>
+          <path d="M8 14h3"></path>
+          <path d="M13 14h3"></path>
+          <path d="M8 18h3"></path>
+        </svg>
+      </span>
+      <strong>Agenda</strong>
+      <small>Consultas, horários e confirmação.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/financeiro">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 7h16v12H4z"></path>
+          <path d="M4 10h16"></path>
+          <path d="M8 15h4"></path>
+          <circle cx="17" cy="15" r="1.2"></circle>
+        </svg>
+      </span>
+      <strong>Financeiro</strong>
+      <small>Tratamentos realizados e valores.</small>
+    </a>
+  </section>
+
   <div class="cabecalho">
     <div>
-      <h1>Dashboard da Clínica</h1>
-      <p>Resumo rápido para acompanhar a rotina de hoje e os retornos importantes.</p>
+      <h2>Resumo operacional</h2>
+      <p>Visão rápida da rotina de hoje, recebimentos e retornos importantes.</p>
     </div>
   </div>
 

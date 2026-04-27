@@ -1,37 +1,29 @@
 <div class="layout">
-    <aside class="sidebar">
-        <div class="brand">
+    <header class="topbar">
+        <a class="brand" routerLink="/app/dashboard" aria-label="Abrir menu principal">
             <img src="assets/lacari-icon.png" alt="Clínica LaCari Odontologia" />
             <div>
                 <strong>LaCari</strong>
                 <span>Odontologia</span>
             </div>
-        </div>
+        </a>
 
-        <nav class="menu">
-            <a routerLink="/app/dashboard" routerLinkActive="ativo">Dashboard</a>
-            <a routerLink="/app/pacientes" routerLinkActive="ativo">Pacientes</a>
-            <a routerLink="/app/importar-ficha" routerLinkActive="ativo">Importar ficha</a>
-            <a routerLink="/app/agenda" routerLinkActive="ativo">Agenda</a>
-            <a routerLink="/app/financeiro" routerLinkActive="ativo">Financeiro</a>
-        </nav>
-    </aside>
+        <div class="topbar-acoes">
+            <a class="btn-menu" routerLink="/app/dashboard">Menu principal</a>
 
-    <div class="content-area">
-        <header class="topbar">
             <div class="usuario">
                 <img src="assets/lacari-icon.png" alt="" />
                 <div>
-                <strong>{{ nomeUsuario }}</strong>
-                <span class="perfil">{{ perfil }}</span>
+                    <strong>{{ nomeUsuario }}</strong>
+                    <span class="perfil">{{ perfil }}</span>
                 </div>
             </div>
 
             <button (click)="logout()">Sair</button>
-        </header>
+        </div>
+    </header>
 
-        <main class="content">
-            <router-outlet></router-outlet>
-        </main>
-    </div>
+    <main class="content">
+        <router-outlet></router-outlet>
+    </main>
 </div>

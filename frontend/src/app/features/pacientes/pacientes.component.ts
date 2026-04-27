@@ -22,6 +22,8 @@ export class PacientesComponent implements OnInit {
   mensagem = '';
   erro = '';
   filtro = '';
+  paginaAtual = 1;
+  itensPorPagina = 10;
 
   constructor(private pacienteService: PacienteService) { }
 
@@ -34,6 +36,7 @@ export class PacientesComponent implements OnInit {
     this.pacienteService.listar().subscribe({
       next: (response) => {
         this.pacientes = response;
+        this.ajustarPaginaAtual();
         this.carregando = false;
       },
       error: () => {
@@ -123,6 +126,24 @@ export class PacientesComponent implements OnInit {
 
   limparFiltro(): void {
     this.filtro = '';
+    this.paginaAtual = 1;
+  }
+
+  aoFiltrar(): void {
+    this.paginaAtual = 1;
+  }
+
+  alterarItensPorPagina(valor: number | string): void {
+    this.itensPorPagina = Number(valor);
+    this.paginaAtual = 1;
+  }
+
+  irParaPagina(pagina: number): void {
+    if (pagina < 1 || pagina > this.totalPaginas) {
+      return;
+    }
+
+    this.paginaAtual = pagina;
   }
 
   get pacientesFiltrados(): Paciente[] {
@@ -142,6 +163,37 @@ export class PacientesComponent implements OnInit {
       paciente.cidade,
       paciente.uf
     ].join(' ')).includes(termo));
+  }
+
+  get pacientesPaginados(): Paciente[] {
+    const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
+    return this.pacientesFiltrados.slice(inicio, inicio + this.itensPorPagina);
+  }
+
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.pacientesFiltrados.length / this.itensPorPagina));
+  }
+
+  get paginas(): number[] {
+    return Array.from({ length: this.totalPaginas }, (_, index) => index + 1);
+  }
+
+  get primeiroItemExibido(): number {
+    if (this.pacientesFiltrados.length === 0) {
+      return 0;
+    }
+
+    return (this.paginaAtual - 1) * this.itensPorPagina + 1;
+  }
+
+  get ultimoItemExibido(): number {
+    return Math.min(this.paginaAtual * this.itensPorPagina, this.pacientesFiltrados.length);
+  }
+
+  private ajustarPaginaAtual(): void {
+    if (this.paginaAtual > this.totalPaginas) {
+      this.paginaAtual = this.totalPaginas;
+    }
   }
 
   private normalizarBusca(valor?: string): string {
