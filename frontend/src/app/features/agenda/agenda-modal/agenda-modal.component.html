@@ -22,7 +22,12 @@
 
       <label>
         Profissional
-        <input [(ngModel)]="form.profissionalId" name="profissionalId" type="number" min="1" [readonly]="modoDetalhe" />
+        <select [(ngModel)]="form.profissionalId" name="profissionalId" [disabled]="modoDetalhe">
+          <option [ngValue]="null">Selecione</option>
+          <option *ngFor="let profissional of profissionais" [ngValue]="profissional.id">
+            {{ profissional.nome }}
+          </option>
+        </select>
       </label>
 
       <label>

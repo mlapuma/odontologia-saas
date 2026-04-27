@@ -36,7 +36,7 @@
       <small>Leitura da identificação do paciente.</small>
     </a>
 
-    <a class="menu-card" routerLink="/app/agenda">
+    <a class="menu-card" routerLink="/app/proximos-agendamentos">
       <span class="menu-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24">
           <rect x="4" y="5" width="16" height="16" rx="2"></rect>
@@ -48,8 +48,8 @@
           <path d="M8 18h3"></path>
         </svg>
       </span>
-      <strong>Agenda</strong>
-      <small>Consultas, horários e confirmação.</small>
+      <strong>Agenda da clínica</strong>
+      <small>Calendário de consultas e horários.</small>
     </a>
 
     <a class="menu-card" routerLink="/app/financeiro">
@@ -62,7 +62,94 @@
         </svg>
       </span>
       <strong>Financeiro</strong>
-      <small>Tratamentos realizados e valores.</small>
+      <small>Recebimentos, cobranças e pendências.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/tratamentos">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 3h10v18H7z"></path>
+          <path d="M10 7h4"></path>
+          <path d="M10 11h4"></path>
+          <path d="M10 15h2"></path>
+          <path d="M17 7h3v10"></path>
+        </svg>
+      </span>
+      <strong>Tratamentos</strong>
+      <small>Registro dos procedimentos realizados.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/integracoes">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M8 8h8v8H8z"></path>
+          <path d="M4 12h4"></path>
+          <path d="M16 12h4"></path>
+          <path d="M12 4v4"></path>
+          <path d="M12 16v4"></path>
+          <path d="M6 6l2 2"></path>
+          <path d="M16 16l2 2"></path>
+          <path d="M18 6l-2 2"></path>
+          <path d="M8 16l-2 2"></path>
+        </svg>
+      </span>
+      <strong>Integrações</strong>
+      <small>Google, WhatsApp e serviços externos.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/profissionais">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="9" cy="8" r="3"></circle>
+          <path d="M4 19c.6-3.2 2.5-5 5-5s4.4 1.8 5 5"></path>
+          <path d="M16 5h4"></path>
+          <path d="M18 3v4"></path>
+          <path d="M16 11h5"></path>
+        </svg>
+      </span>
+      <strong>Profissionais</strong>
+      <small>Cadastro para seleção na agenda.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/google">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8"></circle>
+          <path d="M12 12h7"></path>
+          <path d="M15.5 16.8A5 5 0 1 1 16 8.4"></path>
+        </svg>
+      </span>
+      <strong>Desempenho no Google</strong>
+      <small *ngIf="resumo">{{ resumo.googleBusinessProfile.visualizacoesBusca + resumo.googleBusinessProfile.visualizacoesMaps }} visualizações</small>
+      <small *ngIf="!resumo">Métricas do perfil da clínica.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/agenda">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 5h14v14H5z"></path>
+          <path d="M8 9h8"></path>
+          <path d="M8 13h4"></path>
+          <path d="M16 13l2 2 3-4"></path>
+        </svg>
+      </span>
+      <strong>Próximos atendimentos</strong>
+      <small *ngIf="resumo">{{ resumo.proximosAgendamentos.length }} atendimento(s) futuros</small>
+      <small *ngIf="!resumo">Lista dos atendimentos futuros.</small>
+    </a>
+
+    <a class="menu-card" routerLink="/app/reativacao">
+      <span class="menu-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 8a4 4 0 1 1 8 0"></path>
+          <path d="M4 20c.8-3.8 3.5-6 7-6"></path>
+          <path d="M17 14v6"></path>
+          <path d="M14 17h6"></path>
+        </svg>
+      </span>
+      <strong>Pacientes para reativar</strong>
+      <small *ngIf="resumo">{{ resumo.pacientesParaReativar.length }} paciente(s) sem retorno</small>
+      <small *ngIf="!resumo">Lista para contato por WhatsApp.</small>
     </a>
   </section>
 
@@ -117,46 +204,6 @@
         <span>Pacientes ativos</span>
         <strong>{{ resumo.pacientesAtivos }} / {{ resumo.pacientesTotal }}</strong>
       </div>
-    </div>
-
-    <div class="painel-grid">
-      <section class="painel">
-        <div class="painel-cabecalho">
-          <h2>Próximos agendamentos</h2>
-          <span>Agenda futura</span>
-        </div>
-
-        <div class="lista-vazia" *ngIf="resumo.proximosAgendamentos.length === 0">
-          Nenhum agendamento futuro encontrado.
-        </div>
-
-        <div class="linha-info" *ngFor="let agendamento of resumo.proximosAgendamentos">
-          <div>
-            <strong>{{ agendamento.pacienteNome }}</strong>
-            <span>{{ agendamento.dataHoraInicio | date:'dd/MM/yyyy HH:mm' }}</span>
-          </div>
-          <em>{{ agendamento.status }}</em>
-        </div>
-      </section>
-
-      <section class="painel">
-        <div class="painel-cabecalho">
-          <h2>Pacientes para reativar</h2>
-          <span>Mais de 180 dias</span>
-        </div>
-
-        <div class="lista-vazia" *ngIf="resumo.pacientesParaReativar.length === 0">
-          Nenhum paciente pendente de reativação.
-        </div>
-
-        <div class="linha-info" *ngFor="let paciente of resumo.pacientesParaReativar">
-          <div>
-            <strong>{{ paciente.nome }}</strong>
-            <span>Último tratamento: {{ paciente.ultimaDataTratamento | date:'dd/MM/yyyy' }}</span>
-          </div>
-          <em>{{ paciente.whatsapp }}</em>
-        </div>
-      </section>
     </div>
   </ng-container>
 </div>

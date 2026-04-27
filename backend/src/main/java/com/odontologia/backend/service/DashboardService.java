@@ -11,9 +11,11 @@ import java.time.LocalDateTime;
 public class DashboardService {
 
 	private final DashboardRepository repository;
+	private final GoogleBusinessProfileService googleBusinessProfileService;
 
-	public DashboardService(DashboardRepository repository) {
+	public DashboardService(DashboardRepository repository, GoogleBusinessProfileService googleBusinessProfileService) {
 		this.repository = repository;
+		this.googleBusinessProfileService = googleBusinessProfileService;
 	}
 
 	public DashboardResumoDTO obterResumo(Long tenantId) {
@@ -44,6 +46,7 @@ public class DashboardService {
 		dto.setPacientesSemRetorno(repository.pacientesSemRetorno(tenantId, limiteReativacao));
 		dto.setProximosAgendamentos(repository.proximosAgendamentos(tenantId, LocalDateTime.now()));
 		dto.setPacientesParaReativar(repository.pacientesParaReativar(tenantId, limiteReativacao));
+		dto.setGoogleBusinessProfile(googleBusinessProfileService.obterResumoPerformance());
 
 		return dto;
 	}

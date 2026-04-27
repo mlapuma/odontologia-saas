@@ -89,6 +89,9 @@
                         <td>{{ paciente.endereco }}</td>
                         <td>{{ paciente.cidade }}</td>
                         <td class="acoes-tabela">
+                            <a class="btn-tratamentos" [routerLink]="['/app/tratamentos']" [queryParams]="{ pacienteId: paciente.id }">
+                                Tratamentos
+                            </a>
                             <button class="btn-editar" (click)="editar(paciente)">Editar</button>
                             <button class="btn-excluir" (click)="excluir(paciente.id)">Excluir</button>
                         </td>

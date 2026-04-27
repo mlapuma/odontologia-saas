@@ -1,0 +1,31 @@
+<div class="pagina-reativacao">
+  <div class="cabecalho detalhe-cabecalho">
+    <div>
+      <h1>Pacientes para reativar</h1>
+      <p>Pacientes com tratamento registrado e sem retorno há mais de 180 dias.</p>
+    </div>
+    <a class="btn-voltar" routerLink="/app/dashboard">Voltar</a>
+  </div>
+
+  <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="carregando" *ngIf="carregando">Carregando...</p>
+
+  <section class="painel" *ngIf="resumo && !carregando">
+    <div class="painel-cabecalho">
+      <h2>Lista de pacientes</h2>
+      <span>{{ resumo.pacientesParaReativar.length }} paciente(s)</span>
+    </div>
+
+    <div class="lista-vazia" *ngIf="resumo.pacientesParaReativar.length === 0">
+      Nenhum paciente pendente de reativação.
+    </div>
+
+    <div class="linha-info" *ngFor="let paciente of resumo.pacientesParaReativar">
+      <div>
+        <strong>{{ paciente.nome }}</strong>
+        <span>Último tratamento: {{ paciente.ultimaDataTratamento | date:'dd/MM/yyyy' }}</span>
+      </div>
+      <em>{{ paciente.whatsapp || 'Sem WhatsApp' }}</em>
+    </div>
+  </section>
+</div>

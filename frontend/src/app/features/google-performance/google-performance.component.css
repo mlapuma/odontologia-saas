@@ -1,0 +1,20 @@
+.btn-voltar {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  color: #1c1204;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .detalhe-cabecalho {
+    flex-direction: column;
+  }
+
+  .btn-voltar {
+    width: 100%;
+    text-align: center;
+  }
+}

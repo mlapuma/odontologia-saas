@@ -21,6 +21,7 @@ public class SecurityConfig {
 		http.cors(cors -> {
 		}).csrf(csrf -> csrf.disable()).formLogin(form -> form.disable()).httpBasic(httpBasic -> httpBasic.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/api/integracoes/google-business-profile/callback").permitAll()
 						.requestMatchers("/", "/health", "/error").permitAll().anyRequest().authenticated())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

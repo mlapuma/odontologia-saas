@@ -1,0 +1,64 @@
+<div class="pagina-google">
+  <div class="cabecalho detalhe-cabecalho">
+    <div>
+      <h1>Desempenho no Google</h1>
+      <p>Acompanhe visualizações, ações e termos pesquisados no Perfil da Empresa.</p>
+    </div>
+    <a class="btn-voltar" routerLink="/app/dashboard">Voltar</a>
+  </div>
+
+  <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="carregando" *ngIf="carregando">Carregando...</p>
+
+  <section class="painel google-panel" *ngIf="resumo && !carregando">
+    <div class="painel-cabecalho">
+      <div>
+        <h2>{{ resumo.googleBusinessProfile.localizacao || 'Perfil da Empresa' }}</h2>
+        <span>{{ resumo.googleBusinessProfile.periodo }}</span>
+      </div>
+      <em [class.status-ok]="resumo.googleBusinessProfile.configurado">
+        {{ resumo.googleBusinessProfile.configurado ? 'Conectado' : 'A configurar' }}
+      </em>
+    </div>
+
+    <p class="google-mensagem" *ngIf="resumo.googleBusinessProfile.mensagem">
+      {{ resumo.googleBusinessProfile.mensagem }}
+    </p>
+
+    <div class="google-metricas">
+      <div>
+        <span>Busca Google</span>
+        <strong>{{ resumo.googleBusinessProfile.visualizacoesBusca }}</strong>
+      </div>
+      <div>
+        <span>Google Maps</span>
+        <strong>{{ resumo.googleBusinessProfile.visualizacoesMaps }}</strong>
+      </div>
+      <div>
+        <span>Ligações</span>
+        <strong>{{ resumo.googleBusinessProfile.cliquesTelefone }}</strong>
+      </div>
+      <div>
+        <span>Rotas</span>
+        <strong>{{ resumo.googleBusinessProfile.pedidosRota }}</strong>
+      </div>
+      <div>
+        <span>Cliques no site</span>
+        <strong>{{ resumo.googleBusinessProfile.cliquesSite }}</strong>
+      </div>
+    </div>
+
+    <div class="google-termos">
+      <h3>Termos pesquisados</h3>
+
+      <div class="lista-vazia" *ngIf="resumo.googleBusinessProfile.termosPesquisa.length === 0">
+        Os termos aparecerão aqui quando o Google retornar dados para o período.
+      </div>
+
+      <div class="linha-info" *ngFor="let termo of resumo.googleBusinessProfile.termosPesquisa">
+        <strong>{{ termo.termo }}</strong>
+        <em>{{ termo.impressoes }} impressões</em>
+      </div>
+    </div>
+  </section>
+</div>

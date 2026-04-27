@@ -1,0 +1,69 @@
+<div class="pagina-integracoes">
+  <div class="cabecalho">
+    <div>
+      <h1>Integrações</h1>
+      <p>Conecte serviços externos para enriquecer os indicadores da clínica.</p>
+    </div>
+  </div>
+
+  <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="carregando" *ngIf="carregando">Carregando...</p>
+
+  <section class="integracao-card" *ngIf="google && !carregando">
+    <div class="integracao-topo">
+      <div>
+        <span class="eyebrow">Google Business Profile</span>
+        <h2>Desempenho da clínica no Google</h2>
+        <p>{{ google.mensagem }}</p>
+      </div>
+
+      <strong [class.conectado]="google.autorizado">
+        {{ google.autorizado ? 'Conta autorizada' : google.configurado ? 'Credenciais configuradas' : 'A configurar' }}
+      </strong>
+    </div>
+
+    <div class="acao-integracao">
+      <button type="button" (click)="conectarGoogle()" [disabled]="!google.authorizationUrl">
+        {{ google.autorizado ? 'Reconectar Google' : 'Conectar Google' }}
+      </button>
+      <p *ngIf="!google.authorizationUrl">
+        Cadastre as credenciais no backend para liberar a autorização.
+      </p>
+    </div>
+
+    <div class="checklist-integracao">
+      <div [class.ok]="google.clientIdConfigurado">
+        <span>{{ google.clientIdConfigurado ? 'OK' : 'Pendente' }}</span>
+        Client ID do Google Cloud
+      </div>
+      <div [class.ok]="google.clientSecretConfigurado">
+        <span>{{ google.clientSecretConfigurado ? 'OK' : 'Pendente' }}</span>
+        Client Secret do Google Cloud
+      </div>
+      <div [class.ok]="google.autorizado">
+        <span>{{ google.autorizado ? 'OK' : 'Pendente' }}</span>
+        Autorização da conta Google
+      </div>
+      <div>
+        <span>Retorno</span>
+        {{ google.redirectUri }}
+      </div>
+    </div>
+
+    <div class="escopos">
+      <h3>Permissão necessária</h3>
+      <code *ngFor="let escopo of google.escopos">{{ escopo }}</code>
+    </div>
+
+    <div class="proximos-passos">
+      <h3>Próximos passos</h3>
+      <ol>
+        <li>Criar ou acessar o projeto da clínica no Google Cloud.</li>
+        <li>Habilitar a API Google Business Profile.</li>
+        <li>Criar credenciais OAuth e cadastrar a URL de retorno acima.</li>
+        <li>Informar Client ID e Client Secret no backend.</li>
+        <li>Autorizar a conta Google que administra o perfil da clínica.</li>
+      </ol>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,31 @@
+<div class="pagina-proximos-agendamentos">
+  <div class="cabecalho detalhe-cabecalho">
+    <div>
+      <h1>Próximos atendimentos</h1>
+      <p>Lista dos próximos atendimentos registrados na agenda da clínica.</p>
+    </div>
+    <a class="btn-voltar" routerLink="/app/dashboard">Voltar</a>
+  </div>
+
+  <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="carregando" *ngIf="carregando">Carregando...</p>
+
+  <section class="painel" *ngIf="resumo && !carregando">
+    <div class="painel-cabecalho">
+      <h2>Agenda futura</h2>
+      <span>{{ resumo.proximosAgendamentos.length }} atendimento(s)</span>
+    </div>
+
+    <div class="lista-vazia" *ngIf="resumo.proximosAgendamentos.length === 0">
+      Nenhum agendamento futuro encontrado.
+    </div>
+
+    <div class="linha-info" *ngFor="let agendamento of resumo.proximosAgendamentos">
+      <div>
+        <strong>{{ agendamento.pacienteNome }}</strong>
+        <span>{{ agendamento.dataHoraInicio | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <em>{{ agendamento.status }}</em>
+    </div>
+  </section>
+</div>

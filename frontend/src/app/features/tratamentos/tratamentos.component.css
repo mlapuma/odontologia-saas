@@ -1,0 +1,120 @@
+.cabecalho {
+  margin-bottom: 18px;
+}
+
+.cabecalho h1 {
+  margin: 0 0 8px;
+}
+
+.cabecalho p {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.cabecalho .filtro-paciente {
+  margin-top: 8px;
+  color: #7b560c;
+  font-weight: 700;
+}
+
+.mensagens {
+  margin-bottom: 16px;
+}
+
+.sucesso,
+.erro {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+}
+
+.sucesso {
+  color: var(--color-success);
+  background: #e8f7ed;
+}
+
+.erro {
+  color: var(--color-danger);
+  background: #fff2ee;
+}
+
+.grid-tratamentos {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.card {
+  min-width: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.campos label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #4f402b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+}
+
+button {
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  width: 100%;
+  color: #1c1204;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+}
+
+.tabela-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  font-size: 14px;
+  vertical-align: top;
+}
+
+@media (max-width: 980px) {
+  .grid-tratamentos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 16px;
+  }
+}

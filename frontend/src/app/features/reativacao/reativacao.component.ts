@@ -5,13 +5,13 @@ import { DashboardResumo } from '../../models/dashboard-resumo.model';
 import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-reativacao',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  templateUrl: './reativacao.component.html',
+  styleUrl: './reativacao.component.css'
 })
-export class DashboardComponent implements OnInit {
+export class ReativacaoComponent implements OnInit {
   resumo?: DashboardResumo;
   carregando = false;
   erro = '';
@@ -19,10 +19,10 @@ export class DashboardComponent implements OnInit {
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
-    this.carregarDashboard();
+    this.carregar();
   }
 
-  private carregarDashboard(): void {
+  carregar(): void {
     this.carregando = true;
     this.erro = '';
 
@@ -32,7 +32,7 @@ export class DashboardComponent implements OnInit {
         this.carregando = false;
       },
       error: () => {
-        this.erro = 'Erro ao carregar o dashboard.';
+        this.erro = 'Erro ao carregar pacientes para reativar.';
         this.carregando = false;
       }
     });

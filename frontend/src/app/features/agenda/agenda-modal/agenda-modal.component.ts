@@ -6,9 +6,11 @@ import { AgendamentoDetalhe } from '../../../models/agendamento-detalhe.model';
 import { AgendamentoRequest } from '../../../models/agendamento-request-model';
 import { Paciente } from '../../../models/paciente.model';
 import { Procedimento } from '../../../models/procedimento.model';
+import { Profissional } from '../../../models/profissional.model';
 import { AgendaService } from '../../../services/agenda.service';
 import { PacienteService } from '../../../services/paciente.service';
 import { ProcedimentoService } from '../../../services/procedimento.service';
+import { ProfissionalService } from '../../../services/profissional.service';
 
 @Component({
   selector: 'app-agenda-modal',
@@ -27,6 +29,7 @@ export class AgendaModalComponent implements OnChanges {
 
   pacientes: Paciente[] = [];
   procedimentos: Procedimento[] = [];
+  profissionais: Profissional[] = [];
   detalhe?: AgendamentoDetalhe;
   carregando = false;
   salvando = false;
@@ -37,7 +40,8 @@ export class AgendaModalComponent implements OnChanges {
   constructor(
     private agendaService: AgendaService,
     private pacienteService: PacienteService,
-    private procedimentoService: ProcedimentoService
+    private procedimentoService: ProcedimentoService,
+    private profissionalService: ProfissionalService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -118,11 +122,16 @@ export class AgendaModalComponent implements OnChanges {
 
     forkJoin({
       pacientes: this.pacienteService.listar(),
-      procedimentos: this.procedimentoService.listar()
+      procedimentos: this.procedimentoService.listar(),
+      profissionais: this.profissionalService.listar()
     }).subscribe({
-      next: ({ pacientes, procedimentos }) => {
+      next: ({ pacientes, procedimentos, profissionais }) => {
         this.pacientes = pacientes;
         this.procedimentos = procedimentos.filter(item => item.ativo !== false);
+        this.profissionais = profissionais.filter(item => item.ativo !== false);
+        if (!this.form.profissionalId && this.profissionais.length > 0) {
+          this.form.profissionalId = this.profissionais[0].id || null;
+        }
 
         if (this.agendamentoId) {
           this.carregarDetalhe(this.agendamentoId);
@@ -164,7 +173,7 @@ export class AgendaModalComponent implements OnChanges {
   private novoForm() {
     return {
       pacienteId: null as number | null,
-      profissionalId: 1,
+      profissionalId: null as number | null,
       dataHoraInicio: '',
       procedimentoId: null as number | null,
       quantidade: 1,

@@ -1,0 +1,74 @@
+.grid-profissionais {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+input,
+select {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+}
+
+button {
+  border: 0;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  width: 100%;
+  color: #1c1204;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+}
+
+.btn-secondary {
+  width: 100%;
+  margin-top: 10px;
+  color: #5d3f08;
+  background: var(--color-gold-soft);
+}
+
+.profissional-linha {
+  align-items: center;
+}
+
+.acoes-profissional {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.acoes-profissional button {
+  padding: 8px 10px;
+}
+
+.btn-editar {
+  color: #7b560c;
+  background: #fbf4e5;
+}
+
+.btn-excluir {
+  color: var(--color-danger);
+  background: #fff2ee;
+}
+
+@media (max-width: 900px) {
+  .grid-profissionais {
+    grid-template-columns: 1fr;
+  }
+
+  .profissional-linha,
+  .acoes-profissional {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

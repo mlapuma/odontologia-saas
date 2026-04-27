@@ -1,0 +1,60 @@
+<div class="pagina-profissionais">
+  <div class="cabecalho">
+    <div>
+      <h1>Profissionais</h1>
+      <p>Cadastre os profissionais para seleção nos agendamentos.</p>
+    </div>
+  </div>
+
+  <div class="mensagens">
+    <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+    <p class="erro" *ngIf="erro">{{ erro }}</p>
+  </div>
+
+  <div class="grid-profissionais">
+    <section class="card">
+      <h2>{{ editandoId ? 'Editar profissional' : 'Novo profissional' }}</h2>
+
+      <div class="campos">
+        <input [(ngModel)]="form.nome" placeholder="Nome do profissional" />
+        <select [(ngModel)]="form.especialidade" aria-label="Especialidade">
+          <option value="">Selecione a especialidade</option>
+          <option *ngFor="let especialidade of especialidades" [value]="especialidade">
+            {{ especialidade }}
+          </option>
+        </select>
+        <input [(ngModel)]="form.cro" placeholder="CRO" />
+        <input [(ngModel)]="form.telefone" placeholder="Telefone" />
+        <input [(ngModel)]="form.email" placeholder="E-mail" />
+      </div>
+
+      <button class="btn-primary" type="button" (click)="salvar()" [disabled]="salvando">
+        {{ salvando ? 'Salvando...' : editandoId ? 'Atualizar profissional' : 'Salvar profissional' }}
+      </button>
+      <button class="btn-secondary" type="button" (click)="cancelarEdicao()" *ngIf="editandoId">
+        Cancelar edição
+      </button>
+    </section>
+
+    <section class="card">
+      <h2>Profissionais cadastrados</h2>
+      <p *ngIf="carregando">Carregando...</p>
+
+      <div class="lista-vazia" *ngIf="!carregando && profissionais.length === 0">
+        Nenhum profissional cadastrado.
+      </div>
+
+      <div class="linha-info profissional-linha" *ngFor="let profissional of profissionais">
+        <div>
+          <strong>{{ profissional.nome }}</strong>
+          <span>{{ profissional.especialidade || 'Sem especialidade informada' }}</span>
+        </div>
+        <div class="acoes-profissional">
+          <em>{{ profissional.cro || 'CRO não informado' }}</em>
+          <button class="btn-editar" type="button" (click)="editar(profissional)">Editar</button>
+          <button class="btn-excluir" type="button" (click)="excluir(profissional)">Excluir</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

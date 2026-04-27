@@ -1,8 +1,8 @@
 package com.odontologia.backend.controller;
 
 import com.odontologia.backend.entity.ProcedimentoEntity;
-import com.odontologia.backend.repository.ProcedimentoRepository;
 import com.odontologia.backend.security.TenantContext;
+import com.odontologia.backend.service.ProcedimentoPadraoService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,14 +13,14 @@ import java.util.List;
 @RequestMapping("/api/procedimentos")
 public class ProcedimentoController {
 
-	private final ProcedimentoRepository repository;
+	private final ProcedimentoPadraoService service;
 
-	public ProcedimentoController(ProcedimentoRepository repository) {
-		this.repository = repository;
+	public ProcedimentoController(ProcedimentoPadraoService service) {
+		this.service = service;
 	}
 
 	@GetMapping
 	public List<ProcedimentoEntity> listar() {
-		return repository.findByTenantId(TenantContext.getTenantId());
+		return service.listarComPadroes(TenantContext.getTenantId());
 	}
 }

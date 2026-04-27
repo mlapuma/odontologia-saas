@@ -23,6 +23,7 @@ public class DashboardResumoDTO {
 
 	private List<ProximoAgendamentoDTO> proximosAgendamentos = new ArrayList<>();
 	private List<PacienteSemRetornoDTO> pacientesParaReativar = new ArrayList<>();
+	private GoogleBusinessProfileDTO googleBusinessProfile = new GoogleBusinessProfileDTO();
 
 	public Long getPacientesTotal() {
 		return pacientesTotal;
@@ -120,6 +121,14 @@ public class DashboardResumoDTO {
 		this.pacientesParaReativar = pacientesParaReativar;
 	}
 
+	public GoogleBusinessProfileDTO getGoogleBusinessProfile() {
+		return googleBusinessProfile;
+	}
+
+	public void setGoogleBusinessProfile(GoogleBusinessProfileDTO googleBusinessProfile) {
+		this.googleBusinessProfile = googleBusinessProfile;
+	}
+
 	public static class ProximoAgendamentoDTO {
 		private Long id;
 		private String pacienteNome;
@@ -177,6 +186,117 @@ public class DashboardResumoDTO {
 
 		public LocalDate getUltimaDataTratamento() {
 			return ultimaDataTratamento;
+		}
+	}
+
+	public static class GoogleBusinessProfileDTO {
+		private boolean configurado;
+		private Long visualizacoesBusca = 0L;
+		private Long visualizacoesMaps = 0L;
+		private Long cliquesTelefone = 0L;
+		private Long cliquesSite = 0L;
+		private Long pedidosRota = 0L;
+		private String periodo = "Mês atual";
+		private String localizacao;
+		private String mensagem = "Integração com o Perfil da Empresa no Google ainda não configurada.";
+		private List<TermoPesquisaDTO> termosPesquisa = new ArrayList<>();
+
+		public boolean isConfigurado() {
+			return configurado;
+		}
+
+		public void setConfigurado(boolean configurado) {
+			this.configurado = configurado;
+		}
+
+		public Long getVisualizacoesBusca() {
+			return visualizacoesBusca;
+		}
+
+		public void setVisualizacoesBusca(Long visualizacoesBusca) {
+			this.visualizacoesBusca = visualizacoesBusca;
+		}
+
+		public Long getVisualizacoesMaps() {
+			return visualizacoesMaps;
+		}
+
+		public void setVisualizacoesMaps(Long visualizacoesMaps) {
+			this.visualizacoesMaps = visualizacoesMaps;
+		}
+
+		public Long getCliquesTelefone() {
+			return cliquesTelefone;
+		}
+
+		public void setCliquesTelefone(Long cliquesTelefone) {
+			this.cliquesTelefone = cliquesTelefone;
+		}
+
+		public Long getCliquesSite() {
+			return cliquesSite;
+		}
+
+		public void setCliquesSite(Long cliquesSite) {
+			this.cliquesSite = cliquesSite;
+		}
+
+		public Long getPedidosRota() {
+			return pedidosRota;
+		}
+
+		public void setPedidosRota(Long pedidosRota) {
+			this.pedidosRota = pedidosRota;
+		}
+
+		public String getPeriodo() {
+			return periodo;
+		}
+
+		public void setPeriodo(String periodo) {
+			this.periodo = periodo;
+		}
+
+		public String getLocalizacao() {
+			return localizacao;
+		}
+
+		public void setLocalizacao(String localizacao) {
+			this.localizacao = localizacao;
+		}
+
+		public String getMensagem() {
+			return mensagem;
+		}
+
+		public void setMensagem(String mensagem) {
+			this.mensagem = mensagem;
+		}
+
+		public List<TermoPesquisaDTO> getTermosPesquisa() {
+			return termosPesquisa;
+		}
+
+		public void setTermosPesquisa(List<TermoPesquisaDTO> termosPesquisa) {
+			this.termosPesquisa = termosPesquisa;
+		}
+	}
+
+	public static class TermoPesquisaDTO {
+		private String termo;
+		private Long impressoes;
+
+		public TermoPesquisaDTO(String termo, Long impressoes) {
+			this.termo = termo;
+			this.impressoes = impressoes;
+		}
+
+		public String getTermo() {
+			return termo;
+		}
+
+		public Long getImpressoes() {
+			return impressoes;
 		}
 	}
 }

@@ -1,0 +1,108 @@
+<div class="pagina-tratamentos">
+  <div class="cabecalho">
+    <div>
+      <h1>Tratamentos realizados</h1>
+      <p>Registre os tratamentos feitos, valores pagos e histórico do paciente.</p>
+      <p class="filtro-paciente" *ngIf="pacienteIdFiltro">
+        Visualizando tratamentos de {{ nomePaciente(pacienteIdFiltro) }}.
+      </p>
+    </div>
+  </div>
+
+  <div class="mensagens">
+    <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+    <p class="erro" *ngIf="erro">{{ erro }}</p>
+  </div>
+
+  <p *ngIf="carregando">Carregando...</p>
+
+  <div class="grid-tratamentos" *ngIf="!carregando">
+    <section class="card formulario">
+      <h2>Novo registro</h2>
+
+      <div class="campos">
+        <label>
+          Paciente
+          <select [(ngModel)]="form.pacienteId">
+            <option [ngValue]="null">Selecione</option>
+            <option *ngFor="let paciente of pacientes" [ngValue]="paciente.id">{{ paciente.nome }}</option>
+          </select>
+        </label>
+
+        <label>
+          Procedimento
+          <select [ngModel]="form.procedimentoSelecao" (ngModelChange)="selecionarProcedimento($event)">
+            <option value="">Opcional</option>
+            <optgroup label="Procedimentos cadastrados" *ngIf="procedimentos.length > 0">
+              <option *ngFor="let procedimento of procedimentos" [value]="'procedimento-' + procedimento.id">
+                {{ procedimento.nome }}
+              </option>
+            </optgroup>
+            <optgroup label="Procedimentos odontológicos">
+              <option *ngFor="let procedimento of tratamentosOdontologicos" [value]="'padrao-' + procedimento">
+                {{ procedimento }}
+              </option>
+            </optgroup>
+          </select>
+        </label>
+
+        <label>
+          Tratamento descrito no documento
+          <input [(ngModel)]="form.tratamento" list="opcoes-tratamentos" placeholder="Selecione ou digite o tratamento" />
+          <datalist id="opcoes-tratamentos">
+            <option *ngFor="let tratamento of tratamentosParaSelecao" [value]="tratamento"></option>
+          </datalist>
+        </label>
+
+        <label>
+          Valor pago no dia
+          <input type="number" min="0" step="0.01" [(ngModel)]="form.valorPago" />
+        </label>
+
+        <label>
+          Data do tratamento
+          <input type="date" [(ngModel)]="form.dataRealizacao" />
+        </label>
+
+        <label>
+          Observações
+          <textarea rows="3" [(ngModel)]="form.observacoes"></textarea>
+        </label>
+      </div>
+
+      <button class="btn-primary" type="button" (click)="salvarTratamento()" [disabled]="salvando">
+        {{ salvando ? 'Salvando...' : 'Registrar tratamento' }}
+      </button>
+    </section>
+
+    <section class="card historico">
+      <h2>Histórico registrado</h2>
+
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Tratamento</th>
+              <th>Valor pago</th>
+              <th>Observações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tratamento of tratamentos">
+              <td>{{ tratamento.dataRealizacao | date:'dd/MM/yyyy' }}</td>
+              <td>{{ nomePaciente(tratamento.pacienteId) }}</td>
+              <td>{{ tratamento.tratamento }}</td>
+              <td>{{ tratamento.valorPago | currency:'BRL' }}</td>
+              <td>{{ tratamento.observacoes }}</td>
+            </tr>
+            <tr *ngIf="tratamentos.length === 0">
+              <td colspan="5">Nenhum tratamento registrado ainda.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
