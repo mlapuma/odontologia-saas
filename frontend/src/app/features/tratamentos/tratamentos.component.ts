@@ -64,6 +64,9 @@ export class TratamentosComponent implements OnInit {
   mensagem = '';
   erro = '';
   pacienteIdFiltro?: number;
+  editandoId?: number;
+  formularioAberto = false;
+  filtroPaciente = '';
 
   constructor(
     private pacienteService: PacienteService,
@@ -103,19 +106,25 @@ export class TratamentosComponent implements OnInit {
       return;
     }
 
-    this.salvando = true;
-    this.tratamentoService.salvar({
+    const request = {
       pacienteId: Number(this.form.pacienteId),
       procedimentoId: this.form.procedimentoId ? Number(this.form.procedimentoId) : null,
       tratamento: this.tratamentoDescricao,
       valorPago: Number(this.form.valorPago),
       dataRealizacao: this.form.dataRealizacao,
       observacoes: this.form.observacoes
-    }).subscribe({
+    };
+
+    this.salvando = true;
+    const acao = this.editandoId
+      ? this.tratamentoService.atualizar(this.editandoId, request)
+      : this.tratamentoService.salvar(request);
+
+    acao.subscribe({
       next: () => {
         this.salvando = false;
-        this.mensagem = 'Tratamento registrado com sucesso.';
-        this.form = this.novoForm();
+        this.mensagem = this.editandoId ? 'Tratamento atualizado com sucesso.' : 'Tratamento registrado com sucesso.';
+        this.cancelarEdicao();
         this.carregarTratamentos();
       },
       error: (err) => {
@@ -125,8 +134,85 @@ export class TratamentosComponent implements OnInit {
     });
   }
 
+  editarTratamento(tratamento: TratamentoRealizado): void {
+    if (!tratamento.id) {
+      return;
+    }
+
+    this.editandoId = tratamento.id;
+    this.formularioAberto = true;
+    this.mensagem = '';
+    this.erro = '';
+    this.form = {
+      pacienteId: tratamento.pacienteId,
+      procedimentoId: tratamento.procedimentoId || null,
+      procedimentoSelecao: tratamento.procedimentoId ? `procedimento-${tratamento.procedimentoId}` : `padrao-${tratamento.tratamento}`,
+      tratamento: tratamento.tratamento,
+      valorPago: Number(tratamento.valorPago) || 0,
+      dataRealizacao: tratamento.dataRealizacao,
+      observacoes: tratamento.observacoes || ''
+    };
+  }
+
+  excluirTratamento(tratamento: TratamentoRealizado): void {
+    if (!tratamento.id) {
+      return;
+    }
+
+    const confirmou = confirm(`Deseja excluir o tratamento "${tratamento.tratamento}"?`);
+    if (!confirmou) {
+      return;
+    }
+
+    this.mensagem = '';
+    this.erro = '';
+    this.tratamentoService.excluir(tratamento.id).subscribe({
+      next: () => {
+        this.mensagem = 'Tratamento excluido com sucesso.';
+        if (this.editandoId === tratamento.id) {
+          this.cancelarEdicao();
+        }
+        this.carregarTratamentos();
+      },
+      error: (err) => {
+        this.erro = err?.error?.message || 'Erro ao excluir tratamento.';
+      }
+    });
+  }
+
+  cancelarEdicao(): void {
+    this.editandoId = undefined;
+    this.form = this.novoForm();
+    if (this.pacienteIdFiltro) {
+      this.form.pacienteId = this.pacienteIdFiltro;
+    }
+    this.formularioAberto = false;
+  }
+
+  novoTratamento(): void {
+    this.mensagem = '';
+    this.erro = '';
+    this.editandoId = undefined;
+    this.form = this.novoForm();
+    if (this.pacienteIdFiltro) {
+      this.form.pacienteId = this.pacienteIdFiltro;
+    }
+    this.formularioAberto = true;
+  }
+
   nomePaciente(id: number): string {
     return this.pacientes.find(paciente => paciente.id === id)?.nome || 'Paciente';
+  }
+
+  get tratamentosFiltrados(): TratamentoRealizado[] {
+    const termo = this.filtroPaciente.trim().toLowerCase();
+    if (!termo) {
+      return this.tratamentos;
+    }
+
+    return this.tratamentos.filter(tratamento =>
+      this.nomePaciente(tratamento.pacienteId).toLowerCase().includes(termo)
+    );
   }
 
   get tratamentoDescricao(): string {

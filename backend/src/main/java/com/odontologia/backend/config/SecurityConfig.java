@@ -22,6 +22,7 @@ public class SecurityConfig {
 		}).csrf(csrf -> csrf.disable()).formLogin(form -> form.disable()).httpBasic(httpBasic -> httpBasic.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
 						.requestMatchers("/api/integracoes/google-business-profile/callback").permitAll()
+						.requestMatchers("/api/whatsapp/confirmar-agendamento").permitAll()
 						.requestMatchers("/", "/health", "/error").permitAll().anyRequest().authenticated())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

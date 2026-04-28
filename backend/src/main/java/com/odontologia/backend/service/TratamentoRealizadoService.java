@@ -34,6 +34,35 @@ public class TratamentoRealizadoService {
 
 	@Transactional
 	public TratamentoRealizadoEntity criar(Long tenantId, TratamentoRealizadoRequestDTO dto) {
+		TratamentoRealizadoEntity tratamento = new TratamentoRealizadoEntity();
+		tratamento.setTenantId(tenantId);
+		preencherTratamento(tratamento, dto);
+
+		return repository.save(tratamento);
+	}
+
+	@Transactional
+	public TratamentoRealizadoEntity atualizar(Long tenantId, Long id, TratamentoRealizadoRequestDTO dto) {
+		TratamentoRealizadoEntity tratamento = repository.findById(id).orElseThrow();
+		if (!tratamento.getTenantId().equals(tenantId)) {
+			throw new RuntimeException("Tratamento nao encontrado.");
+		}
+
+		preencherTratamento(tratamento, dto);
+		return repository.save(tratamento);
+	}
+
+	@Transactional
+	public void excluir(Long tenantId, Long id) {
+		TratamentoRealizadoEntity tratamento = repository.findById(id).orElseThrow();
+		if (!tratamento.getTenantId().equals(tenantId)) {
+			throw new RuntimeException("Tratamento nao encontrado.");
+		}
+
+		repository.delete(tratamento);
+	}
+
+	private void preencherTratamento(TratamentoRealizadoEntity tratamento, TratamentoRealizadoRequestDTO dto) {
 		if (dto.getPacienteId() == null) {
 			throw new RuntimeException("Paciente e obrigatorio.");
 		}
@@ -41,16 +70,12 @@ public class TratamentoRealizadoService {
 			throw new RuntimeException("Valor pago deve ser informado.");
 		}
 
-		TratamentoRealizadoEntity tratamento = new TratamentoRealizadoEntity();
-		tratamento.setTenantId(tenantId);
 		tratamento.setPacienteId(dto.getPacienteId());
 		tratamento.setProcedimentoId(dto.getProcedimentoId());
 		tratamento.setTratamento(resolveTratamento(dto));
 		tratamento.setValorPago(dto.getValorPago());
 		tratamento.setDataRealizacao(dto.getDataRealizacao() == null ? LocalDate.now() : dto.getDataRealizacao());
 		tratamento.setObservacoes(dto.getObservacoes());
-
-		return repository.save(tratamento);
 	}
 
 	public List<PacienteReativacaoDTO> pacientesParaReativacao(Long tenantId, int diasSemComparecer) {

@@ -34,6 +34,27 @@ public class WhatsappController {
 		return confirmacaoService.processarResposta(dto);
 	}
 
+	@GetMapping(value = "/confirmar-agendamento", produces = "text/html; charset=UTF-8")
+	public String confirmarAgendamento(@RequestParam Long agendamentoId, @RequestParam String resposta) {
+		ConfirmacaoWhatsappDTO dto = new ConfirmacaoWhatsappDTO();
+		dto.setAgendamentoId(agendamentoId);
+		dto.setResposta(resposta);
+		AgendamentoEntity agendamento = confirmacaoService.processarResposta(dto);
+		String mensagem = "CANCELADO".equalsIgnoreCase(agendamento.getStatus())
+				? "Agendamento cancelado com sucesso."
+				: "Agendamento confirmado com sucesso.";
+		return """
+				<!doctype html>
+				<html lang="pt-BR">
+				<head><meta charset="UTF-8"><title>Confirmação</title></head>
+				<body style="font-family:Arial,sans-serif;padding:32px">
+				  <h1>%s</h1>
+				  <p>Você já pode fechar esta página.</p>
+				</body>
+				</html>
+				""".formatted(mensagem);
+	}
+
 	@PostMapping("/campanhas/aniversarios/executar")
 	public void executarAniversarios(@RequestParam(defaultValue = "1") Long tenantId) {
 		campanhaService.enviarAniversariantesDoDia(tenantId);

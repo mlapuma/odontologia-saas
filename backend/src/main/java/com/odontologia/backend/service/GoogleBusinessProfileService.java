@@ -126,10 +126,13 @@ public class GoogleBusinessProfileService {
 			preencherMetricas(google, localizacao.name(), accessToken);
 			preencherTermosPesquisa(google, localizacao.name(), accessToken);
 			google.setMensagem("Métricas carregadas do Google Business Profile.");
+			google.setMetricasDisponiveis(true);
 			atualizarCache(google);
 			return google;
 		} catch (RuntimeException ex) {
 			google.setMensagem(mensagemAmigavelGoogle(ex.getMessage()));
+			google.setMetricasDisponiveis(false);
+			atualizarCache(google);
 			return google;
 		}
 	}

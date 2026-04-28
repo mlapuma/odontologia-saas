@@ -2,12 +2,13 @@
   <div class="cabecalho detalhe-cabecalho">
     <div>
       <h1>Pacientes para reativar</h1>
-      <p>Pacientes com tratamento registrado e sem retorno há mais de 180 dias.</p>
+      <p>Pacientes com tratamento registrado e sem retorno ha mais de 180 dias.</p>
     </div>
     <a class="btn-voltar" routerLink="/app/dashboard">Voltar</a>
   </div>
 
   <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="aviso" *ngIf="aviso">{{ aviso }}</p>
   <p class="carregando" *ngIf="carregando">Carregando...</p>
 
   <section class="painel" *ngIf="resumo && !carregando">
@@ -16,16 +17,38 @@
       <span>{{ resumo.pacientesParaReativar.length }} paciente(s)</span>
     </div>
 
+    <div class="modelo-mensagem">
+      <label>
+        Mensagem para enviar
+        <select [(ngModel)]="mensagemSelecionada">
+          <option *ngFor="let modelo of modelosMensagem" [value]="modelo.id">
+            {{ modelo.nome }}
+          </option>
+        </select>
+      </label>
+    </div>
+
     <div class="lista-vazia" *ngIf="resumo.pacientesParaReativar.length === 0">
-      Nenhum paciente pendente de reativação.
+      Nenhum paciente pendente de reativacao.
     </div>
 
     <div class="linha-info" *ngFor="let paciente of resumo.pacientesParaReativar">
       <div>
         <strong>{{ paciente.nome }}</strong>
-        <span>Último tratamento: {{ paciente.ultimaDataTratamento | date:'dd/MM/yyyy' }}</span>
+        <span>Ultimo tratamento: {{ paciente.ultimaDataTratamento | date:'dd/MM/yyyy' }}</span>
       </div>
-      <em>{{ paciente.whatsapp || 'Sem WhatsApp' }}</em>
+      <div class="acoes-whatsapp">
+        <span>{{ paciente.whatsapp || 'Sem WhatsApp' }}</span>
+        <button
+          class="btn-whatsapp"
+          type="button"
+          title="Enviar mensagem pelo WhatsApp"
+          aria-label="Enviar mensagem pelo WhatsApp"
+          (click)="enviarWhatsapp(paciente)"
+        >
+          WA
+        </button>
+      </div>
     </div>
   </section>
 </div>

@@ -13,6 +13,7 @@ public class AgendamentoDetalheResponseDTO {
 	private LocalDateTime dataHoraInicio;
 	private LocalDateTime dataHoraFim;
 	private String status;
+	private String observacoes;
 	private Boolean confirmadoWhatsapp;
 	private BigDecimal valorTotal;
 	private Integer duracaoTotalMinutos;
@@ -72,6 +73,14 @@ public class AgendamentoDetalheResponseDTO {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getObservacoes() {
+		return observacoes;
+	}
+
+	public void setObservacoes(String observacoes) {
+		this.observacoes = observacoes;
 	}
 
 	public Boolean getConfirmadoWhatsapp() {

@@ -1,6 +1,11 @@
 export interface ProximoAgendamento {
   id: number;
+  pacienteId?: number;
   pacienteNome: string;
+  pacienteWhatsapp?: string;
+  profissionalId?: number;
+  profissionalNome?: string;
+  tratamento?: string;
   dataHoraInicio: string;
   status: string;
 }
@@ -27,6 +32,7 @@ export interface GoogleBusinessProfile {
   periodo: string;
   localizacao?: string;
   mensagem: string;
+  metricasDisponiveis: boolean;
   termosPesquisa: TermoPesquisaGoogle[];
 }
 

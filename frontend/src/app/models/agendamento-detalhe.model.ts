@@ -8,6 +8,7 @@ export interface AgendamentoDetalhe {
   dataHoraInicio: string;
   dataHoraFim: string;
   status: string;
+  observacoes?: string;
   confirmadoWhatsapp: boolean;
   valorTotal: number;
   duracaoTotalMinutos: number;

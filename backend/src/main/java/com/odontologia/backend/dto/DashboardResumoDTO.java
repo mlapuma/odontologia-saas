@@ -131,13 +131,25 @@ public class DashboardResumoDTO {
 
 	public static class ProximoAgendamentoDTO {
 		private Long id;
+		private Long pacienteId;
 		private String pacienteNome;
+		private String pacienteWhatsapp;
+		private Long profissionalId;
+		private String profissionalNome;
+		private String tratamento;
 		private LocalDateTime dataHoraInicio;
 		private String status;
 
-		public ProximoAgendamentoDTO(Long id, String pacienteNome, LocalDateTime dataHoraInicio, String status) {
+		public ProximoAgendamentoDTO(Long id, Long pacienteId, String pacienteNome, String pacienteWhatsapp,
+				Long profissionalId, String profissionalNome, String tratamento, LocalDateTime dataHoraInicio,
+				String status) {
 			this.id = id;
+			this.pacienteId = pacienteId;
 			this.pacienteNome = pacienteNome;
+			this.pacienteWhatsapp = pacienteWhatsapp;
+			this.profissionalId = profissionalId;
+			this.profissionalNome = profissionalNome;
+			this.tratamento = tratamento;
 			this.dataHoraInicio = dataHoraInicio;
 			this.status = status;
 		}
@@ -146,8 +158,28 @@ public class DashboardResumoDTO {
 			return id;
 		}
 
+		public Long getPacienteId() {
+			return pacienteId;
+		}
+
 		public String getPacienteNome() {
 			return pacienteNome;
+		}
+
+		public String getPacienteWhatsapp() {
+			return pacienteWhatsapp;
+		}
+
+		public Long getProfissionalId() {
+			return profissionalId;
+		}
+
+		public String getProfissionalNome() {
+			return profissionalNome;
+		}
+
+		public String getTratamento() {
+			return tratamento;
 		}
 
 		public LocalDateTime getDataHoraInicio() {
@@ -199,6 +231,7 @@ public class DashboardResumoDTO {
 		private String periodo = "Mês atual";
 		private String localizacao;
 		private String mensagem = "Integração com o Perfil da Empresa no Google ainda não configurada.";
+		private boolean metricasDisponiveis;
 		private List<TermoPesquisaDTO> termosPesquisa = new ArrayList<>();
 
 		public boolean isConfigurado() {
@@ -271,6 +304,14 @@ public class DashboardResumoDTO {
 
 		public void setMensagem(String mensagem) {
 			this.mensagem = mensagem;
+		}
+
+		public boolean isMetricasDisponiveis() {
+			return metricasDisponiveis;
+		}
+
+		public void setMetricasDisponiveis(boolean metricasDisponiveis) {
+			this.metricasDisponiveis = metricasDisponiveis;
 		}
 
 		public List<TermoPesquisaDTO> getTermosPesquisa() {

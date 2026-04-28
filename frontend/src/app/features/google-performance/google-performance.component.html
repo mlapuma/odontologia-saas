@@ -28,23 +28,23 @@
     <div class="google-metricas">
       <div>
         <span>Busca Google</span>
-        <strong>{{ resumo.googleBusinessProfile.visualizacoesBusca }}</strong>
+        <strong>{{ resumo.googleBusinessProfile.metricasDisponiveis ? resumo.googleBusinessProfile.visualizacoesBusca : '-' }}</strong>
       </div>
       <div>
         <span>Google Maps</span>
-        <strong>{{ resumo.googleBusinessProfile.visualizacoesMaps }}</strong>
+        <strong>{{ resumo.googleBusinessProfile.metricasDisponiveis ? resumo.googleBusinessProfile.visualizacoesMaps : '-' }}</strong>
       </div>
       <div>
         <span>Ligações</span>
-        <strong>{{ resumo.googleBusinessProfile.cliquesTelefone }}</strong>
+        <strong>{{ resumo.googleBusinessProfile.metricasDisponiveis ? resumo.googleBusinessProfile.cliquesTelefone : '-' }}</strong>
       </div>
       <div>
         <span>Rotas</span>
-        <strong>{{ resumo.googleBusinessProfile.pedidosRota }}</strong>
+        <strong>{{ resumo.googleBusinessProfile.metricasDisponiveis ? resumo.googleBusinessProfile.pedidosRota : '-' }}</strong>
       </div>
       <div>
         <span>Cliques no site</span>
-        <strong>{{ resumo.googleBusinessProfile.cliquesSite }}</strong>
+        <strong>{{ resumo.googleBusinessProfile.metricasDisponiveis ? resumo.googleBusinessProfile.cliquesSite : '-' }}</strong>
       </div>
     </div>
 

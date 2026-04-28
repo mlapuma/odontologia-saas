@@ -25,6 +25,14 @@ export class TratamentoRealizadoService {
     return this.http.post<TratamentoRealizado>(this.api, tratamento);
   }
 
+  atualizar(id: number, tratamento: TratamentoRealizado): Observable<TratamentoRealizado> {
+    return this.http.put<TratamentoRealizado>(`${this.api}/${id}`, tratamento);
+  }
+
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/${id}`);
+  }
+
   pacientesParaReativacao(diasSemComparecer: number): Observable<PacienteReativacao[]> {
     const params = new HttpParams().set('diasSemComparecer', diasSemComparecer);
     return this.http.get<PacienteReativacao[]>(`${this.api}/pacientes-reativacao`, { params });

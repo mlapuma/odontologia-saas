@@ -23,6 +23,10 @@ export class AgendaService {
     return this.http.post<AgendamentoDetalhe>(this.api, agendamento);
   }
 
+  atualizar(id: number, agendamento: AgendamentoRequest): Observable<AgendamentoDetalhe> {
+    return this.http.put<AgendamentoDetalhe>(`${this.api}/${id}`, agendamento);
+  }
+
   detalhar(id: number): Observable<AgendamentoDetalhe> {
     return this.http.get<AgendamentoDetalhe>(`${this.api}/${id}`);
   }

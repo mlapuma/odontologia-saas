@@ -1,4 +1,8 @@
 .cabecalho {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 18px;
 }
 
@@ -39,8 +43,36 @@
 
 .grid-tratamentos {
   display: grid;
-  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
   gap: 20px;
+}
+
+.grid-tratamentos.apenas-formulario {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.grid-tratamentos.apenas-formulario .formulario {
+  width: min(860px, 100%);
+}
+
+.grid-tratamentos.apenas-formulario .campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.grid-tratamentos.apenas-formulario .campos label:nth-child(3),
+.grid-tratamentos.apenas-formulario .campos label:nth-child(6) {
+  grid-column: 1 / -1;
+}
+
+.grid-tratamentos.apenas-historico {
+  grid-template-columns: 1fr;
+}
+
+.grid-tratamentos.apenas-historico .historico {
+  width: 100%;
 }
 
 .card {
@@ -50,6 +82,28 @@
   border-radius: var(--radius);
   padding: 20px;
   box-shadow: var(--shadow-sm);
+}
+
+.historico-cabecalho {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.historico-cabecalho h2 {
+  margin: 0;
+}
+
+.historico-cabecalho label {
+  display: flex;
+  width: min(420px, 100%);
+  flex-direction: column;
+  gap: 6px;
+  color: #4f402b;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .campos {
@@ -82,20 +136,82 @@ button {
   cursor: pointer;
 }
 
+.btn-novo {
+  flex: 0 0 auto;
+  color: #1c1204;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+  font-weight: 700;
+}
+
 .btn-primary {
   width: 100%;
   color: #1c1204;
   background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
 }
 
+.btn-secondary {
+  width: 100%;
+  margin-top: 10px;
+  color: #5d3f08;
+  background: var(--color-gold-soft);
+}
+
+.acoes {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+  justify-content: flex-start;
+}
+
+.acoes button {
+  padding: 9px 12px;
+}
+
+.btn-editar {
+  color: #7b560c;
+  background: #fbf4e5;
+}
+
+.btn-excluir {
+  color: var(--color-danger);
+  background: #fff2ee;
+}
+
 .tabela-scroll {
   overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 table {
   width: 100%;
-  min-width: 720px;
+  min-width: 980px;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+  width: 118px;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  width: 170px;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 240px;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 110px;
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+  width: 200px;
 }
 
 th,
@@ -103,17 +219,45 @@ td {
   padding: 12px;
   border-bottom: 1px solid var(--color-border);
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.35;
   vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+th {
+  white-space: normal;
 }
 
 @media (max-width: 980px) {
   .grid-tratamentos {
     grid-template-columns: 1fr;
   }
+
+  table {
+    min-width: 940px;
+  }
 }
 
 @media (max-width: 640px) {
+  .cabecalho {
+    flex-direction: column;
+  }
+
+  .btn-novo {
+    width: 100%;
+  }
+
+  .historico-cabecalho {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .grid-tratamentos.apenas-formulario .campos {
+    display: flex;
+    flex-direction: column;
+  }
+
   .card {
     padding: 16px;
   }

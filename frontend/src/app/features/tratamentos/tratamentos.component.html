@@ -2,11 +2,14 @@
   <div class="cabecalho">
     <div>
       <h1>Tratamentos realizados</h1>
-      <p>Registre os tratamentos feitos, valores pagos e histórico do paciente.</p>
+      <p>Registre os tratamentos feitos, valores pagos e hist&oacute;rico do paciente.</p>
       <p class="filtro-paciente" *ngIf="pacienteIdFiltro">
         Visualizando tratamentos de {{ nomePaciente(pacienteIdFiltro) }}.
       </p>
     </div>
+    <button class="btn-novo" type="button" (click)="novoTratamento()" *ngIf="!formularioAberto">
+      Novo tratamento
+    </button>
   </div>
 
   <div class="mensagens">
@@ -16,9 +19,14 @@
 
   <p *ngIf="carregando">Carregando...</p>
 
-  <div class="grid-tratamentos" *ngIf="!carregando">
-    <section class="card formulario">
-      <h2>Novo registro</h2>
+  <div
+    class="grid-tratamentos"
+    [class.apenas-formulario]="formularioAberto"
+    [class.apenas-historico]="!formularioAberto"
+    *ngIf="!carregando"
+  >
+    <section class="card formulario" *ngIf="formularioAberto">
+      <h2>{{ editandoId ? 'Editar tratamento' : 'Novo registro' }}</h2>
 
       <div class="campos">
         <label>
@@ -38,7 +46,7 @@
                 {{ procedimento.nome }}
               </option>
             </optgroup>
-            <optgroup label="Procedimentos odontológicos">
+            <optgroup label="Procedimentos odontol&oacute;gicos">
               <option *ngFor="let procedimento of tratamentosOdontologicos" [value]="'padrao-' + procedimento">
                 {{ procedimento }}
               </option>
@@ -65,18 +73,30 @@
         </label>
 
         <label>
-          Observações
+          Observa&ccedil;&otilde;es
           <textarea rows="3" [(ngModel)]="form.observacoes"></textarea>
         </label>
       </div>
 
       <button class="btn-primary" type="button" (click)="salvarTratamento()" [disabled]="salvando">
-        {{ salvando ? 'Salvando...' : 'Registrar tratamento' }}
+        {{ salvando ? 'Salvando...' : editandoId ? 'Atualizar tratamento' : 'Registrar tratamento' }}
+      </button>
+      <button class="btn-secondary" type="button" (click)="cancelarEdicao()" *ngIf="editandoId">
+        Cancelar
+      </button>
+      <button class="btn-secondary" type="button" (click)="cancelarEdicao()" *ngIf="!editandoId">
+        Fechar cadastro
       </button>
     </section>
 
-    <section class="card historico">
-      <h2>Histórico registrado</h2>
+    <section class="card historico" *ngIf="!formularioAberto">
+      <div class="historico-cabecalho">
+        <h2>Hist&oacute;rico registrado</h2>
+        <label>
+          Filtrar paciente
+          <input type="search" [(ngModel)]="filtroPaciente" placeholder="Buscar pelo nome do paciente" />
+        </label>
+      </div>
 
       <div class="tabela-scroll">
         <table>
@@ -86,19 +106,24 @@
               <th>Paciente</th>
               <th>Tratamento</th>
               <th>Valor pago</th>
-              <th>Observações</th>
+              <th>Observa&ccedil;&otilde;es</th>
+              <th>A&ccedil;&otilde;es</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let tratamento of tratamentos">
+            <tr *ngFor="let tratamento of tratamentosFiltrados">
               <td>{{ tratamento.dataRealizacao | date:'dd/MM/yyyy' }}</td>
               <td>{{ nomePaciente(tratamento.pacienteId) }}</td>
               <td>{{ tratamento.tratamento }}</td>
               <td>{{ tratamento.valorPago | currency:'BRL' }}</td>
               <td>{{ tratamento.observacoes }}</td>
+              <td class="acoes">
+                <button class="btn-editar" type="button" (click)="editarTratamento(tratamento)">Editar</button>
+                <button class="btn-excluir" type="button" (click)="excluirTratamento(tratamento)">Excluir</button>
+              </td>
             </tr>
-            <tr *ngIf="tratamentos.length === 0">
-              <td colspan="5">Nenhum tratamento registrado ainda.</td>
+            <tr *ngIf="tratamentosFiltrados.length === 0">
+              <td colspan="6">Nenhum tratamento registrado ainda.</td>
             </tr>
           </tbody>
         </table>

@@ -138,15 +138,24 @@ public class DashboardRepository {
 		return entityManager.createQuery("""
 				select new com.odontologia.backend.dto.DashboardResumoDTO$ProximoAgendamentoDTO(
 					a.id,
+					p.id,
 					p.nome,
+					p.whatsapp,
+					prof.id,
+					prof.nome,
+					min(proc.nome),
 					a.dataHoraInicio,
 					a.status
 				)
 				from AgendamentoEntity a
 				join PacienteEntity p on p.id = a.pacienteId and p.tenantId = a.tenantId
+				left join ProfissionalEntity prof on prof.id = a.profissionalId and prof.tenantId = a.tenantId
+				left join AgendamentoProcedimentoEntity ap on ap.agendamentoId = a.id
+				left join ProcedimentoEntity proc on proc.id = ap.procedimentoId
 				where a.tenantId = :tenantId
 				  and a.status <> 'CANCELADO'
 				  and a.dataHoraInicio >= :agora
+				group by a.id, p.id, p.nome, p.whatsapp, prof.id, prof.nome, a.dataHoraInicio, a.status
 				order by a.dataHoraInicio asc
 				""", DashboardResumoDTO.ProximoAgendamentoDTO.class).setParameter("tenantId", tenantId)
 				.setParameter("agora", agora).setMaxResults(5).getResultList();

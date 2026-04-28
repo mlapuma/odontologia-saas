@@ -1,31 +1,62 @@
 <div class="pagina-proximos-agendamentos">
   <div class="cabecalho detalhe-cabecalho">
     <div>
-      <h1>Próximos atendimentos</h1>
-      <p>Lista dos próximos atendimentos registrados na agenda da clínica.</p>
+      <h1>Proximos atendimentos</h1>
+      <p>Lista dos proximos atendimentos registrados na agenda da clinica.</p>
     </div>
     <a class="btn-voltar" routerLink="/app/dashboard">Voltar</a>
   </div>
 
   <p class="erro" *ngIf="erro">{{ erro }}</p>
+  <p class="aviso" *ngIf="aviso">{{ aviso }}</p>
   <p class="carregando" *ngIf="carregando">Carregando...</p>
 
   <section class="painel" *ngIf="resumo && !carregando">
     <div class="painel-cabecalho">
       <h2>Agenda futura</h2>
-      <span>{{ resumo.proximosAgendamentos.length }} atendimento(s)</span>
+      <span>{{ agendamentosFiltrados.length }} atendimento(s)</span>
     </div>
 
-    <div class="lista-vazia" *ngIf="resumo.proximosAgendamentos.length === 0">
+    <div class="filtros">
+      <label>
+        Profissional
+        <select [(ngModel)]="profissionalFiltro">
+          <option [ngValue]="null">Todos os profissionais</option>
+          <option *ngFor="let profissional of profissionais" [ngValue]="profissional.id">
+            {{ profissional.nome }}
+          </option>
+        </select>
+      </label>
+
+      <button class="btn-whatsapp" type="button" (click)="compartilharAgendaWhatsapp()">
+        Compartilhar agenda no WhatsApp
+      </button>
+    </div>
+
+    <div class="lista-vazia" *ngIf="agendamentosFiltrados.length === 0">
       Nenhum agendamento futuro encontrado.
     </div>
 
-    <div class="linha-info" *ngFor="let agendamento of resumo.proximosAgendamentos">
+    <div class="linha-info" *ngFor="let agendamento of agendamentosFiltrados">
       <div>
         <strong>{{ agendamento.pacienteNome }}</strong>
         <span>{{ agendamento.dataHoraInicio | date:'dd/MM/yyyy HH:mm' }}</span>
+        <small>Profissional: {{ agendamento.profissionalNome || 'Nao informado' }}</small>
+        <small>Tratamento: {{ agendamento.tratamento || 'Nao informado' }}</small>
+        <small>WhatsApp: {{ agendamento.pacienteWhatsapp || 'Nao informado' }}</small>
       </div>
-      <em>{{ agendamento.status }}</em>
+      <div class="acoes-atendimento">
+        <button
+          class="btn-whatsapp-paciente"
+          type="button"
+          title="Enviar confirmacao pelo WhatsApp"
+          aria-label="Enviar confirmacao pelo WhatsApp"
+          (click)="confirmarAtendimentoWhatsapp(agendamento)"
+        >
+          WA
+        </button>
+        <em>{{ agendamento.status }}</em>
+      </div>
     </div>
   </section>
 </div>

@@ -29,6 +29,16 @@ public class TratamentoRealizadoController {
 		return service.criar(TenantContext.getTenantId(), dto);
 	}
 
+	@PutMapping("/{id}")
+	public TratamentoRealizadoEntity atualizar(@PathVariable Long id, @RequestBody TratamentoRealizadoRequestDTO dto) {
+		return service.atualizar(TenantContext.getTenantId(), id, dto);
+	}
+
+	@DeleteMapping("/{id}")
+	public void excluir(@PathVariable Long id) {
+		service.excluir(TenantContext.getTenantId(), id);
+	}
+
 	@GetMapping("/pacientes-reativacao")
 	public List<PacienteReativacaoDTO> pacientesParaReativacao(
 			@RequestParam(defaultValue = "180") int diasSemComparecer) {

@@ -40,19 +40,10 @@ public class AgendamentoService {
 			throw new RuntimeException("É obrigatório informar ao menos um procedimento.");
 		}
 
-		Integer duracaoTotal = 0;
-		BigDecimal valorTotal = BigDecimal.ZERO;
-
-		for (AgendamentoProcedimentoDTO item : dto.getProcedimentos()) {
-			ProcedimentoEntity procedimento = procedimentoRepository.findById(item.getProcedimentoId()).orElseThrow();
-			int quantidade = item.getQuantidade() == null ? 1 : item.getQuantidade();
-
-			duracaoTotal += procedimento.getDuracaoMinutos() * quantidade;
-			valorTotal = valorTotal.add(procedimento.getValorBase().multiply(BigDecimal.valueOf(quantidade)));
-		}
+		ResumoAgendamento resumo = calcularResumo(dto.getProcedimentos());
 
 		LocalDateTime inicio = dto.getDataHoraInicio();
-		LocalDateTime fim = inicio.plusMinutes(duracaoTotal);
+		LocalDateTime fim = inicio.plusMinutes(resumo.duracaoTotal());
 
 		validarConflito(dto.getTenantId(), dto.getProfissionalId(), inicio, fim);
 
@@ -81,7 +72,45 @@ public class AgendamentoService {
 			agendamentoProcedimentoRepository.save(ap);
 		}
 
-		return montarDetalhe(salvo, valorTotal, duracaoTotal);
+		return montarDetalhe(salvo, resumo.valorTotal(), resumo.duracaoTotal(), dto.getProcedimentos());
+	}
+
+	@Transactional
+	public AgendamentoDetalheResponseDTO atualizar(Long id, AgendamentoRequestDTO dto) {
+		if (dto.getProcedimentos() == null || dto.getProcedimentos().isEmpty()) {
+			throw new RuntimeException("É obrigatório informar ao menos um procedimento.");
+		}
+
+		AgendamentoEntity entity = repository.findById(id).orElseThrow();
+		ResumoAgendamento resumo = calcularResumo(dto.getProcedimentos());
+		LocalDateTime inicio = dto.getDataHoraInicio();
+		LocalDateTime fim = inicio.plusMinutes(resumo.duracaoTotal());
+
+		validarConflito(entity.getTenantId(), dto.getProfissionalId(), id, inicio, fim);
+
+		entity.setPacienteId(dto.getPacienteId());
+		entity.setProfissionalId(dto.getProfissionalId());
+		entity.setTabelaPrecoId(dto.getTabelaPrecoId());
+		entity.setDataHoraInicio(inicio);
+		entity.setDataHoraFim(fim);
+		entity.setObservacoes(dto.getObservacoes());
+
+		AgendamentoEntity salvo = repository.save(entity);
+
+		agendamentoProcedimentoRepository.deleteByAgendamentoId(id);
+		for (AgendamentoProcedimentoDTO item : dto.getProcedimentos()) {
+			ProcedimentoEntity procedimento = procedimentoRepository.findById(item.getProcedimentoId()).orElseThrow();
+
+			AgendamentoProcedimentoEntity ap = new AgendamentoProcedimentoEntity();
+			ap.setAgendamentoId(salvo.getId());
+			ap.setProcedimentoId(procedimento.getId());
+			ap.setQuantidade(item.getQuantidade() == null ? 1 : item.getQuantidade());
+			ap.setValorCobrado(procedimento.getValorBase());
+
+			agendamentoProcedimentoRepository.save(ap);
+		}
+
+		return montarDetalhe(salvo, resumo.valorTotal(), resumo.duracaoTotal(), dto.getProcedimentos());
 	}
 
 	public List<AgendamentoEntity> listarPorProfissional(Long tenantId, Long profissionalId) {
@@ -131,6 +160,7 @@ public class AgendamentoService {
 		response.setDataHoraInicio(entity.getDataHoraInicio());
 		response.setDataHoraFim(entity.getDataHoraFim());
 		response.setStatus(entity.getStatus());
+		response.setObservacoes(entity.getObservacoes());
 		response.setConfirmadoWhatsapp(entity.getConfirmadoWhatsapp());
 		response.setValorTotal(valorTotal);
 		response.setDuracaoTotalMinutos(duracaoTotal);
@@ -140,7 +170,7 @@ public class AgendamentoService {
 	}
 
 	private AgendamentoDetalheResponseDTO montarDetalhe(AgendamentoEntity entity, BigDecimal valorTotal,
-			Integer duracaoTotal) {
+			Integer duracaoTotal, List<AgendamentoProcedimentoDTO> procedimentos) {
 		AgendamentoDetalheResponseDTO response = new AgendamentoDetalheResponseDTO();
 		response.setId(entity.getId());
 		response.setTenantId(entity.getTenantId());
@@ -149,9 +179,11 @@ public class AgendamentoService {
 		response.setDataHoraInicio(entity.getDataHoraInicio());
 		response.setDataHoraFim(entity.getDataHoraFim());
 		response.setStatus(entity.getStatus());
+		response.setObservacoes(entity.getObservacoes());
 		response.setConfirmadoWhatsapp(entity.getConfirmadoWhatsapp());
 		response.setValorTotal(valorTotal);
 		response.setDuracaoTotalMinutos(duracaoTotal);
+		response.setProcedimentos(procedimentos);
 		return response;
 	}
 
@@ -160,6 +192,33 @@ public class AgendamentoService {
 		if (!conflitos.isEmpty()) {
 			throw new RuntimeException("Já existe agendamento para este profissional no horário informado.");
 		}
+	}
+
+	private void validarConflito(Long tenantId, Long profissionalId, Long agendamentoId, LocalDateTime inicio,
+			LocalDateTime fim) {
+		List<AgendamentoEntity> conflitos = repository.buscarConflitosIgnorandoAgendamento(tenantId, profissionalId,
+				agendamentoId, inicio, fim);
+		if (!conflitos.isEmpty()) {
+			throw new RuntimeException("Já existe agendamento para este profissional no horário informado.");
+		}
+	}
+
+	private ResumoAgendamento calcularResumo(List<AgendamentoProcedimentoDTO> procedimentos) {
+		Integer duracaoTotal = 0;
+		BigDecimal valorTotal = BigDecimal.ZERO;
+
+		for (AgendamentoProcedimentoDTO item : procedimentos) {
+			ProcedimentoEntity procedimento = procedimentoRepository.findById(item.getProcedimentoId()).orElseThrow();
+			int quantidade = item.getQuantidade() == null ? 1 : item.getQuantidade();
+
+			duracaoTotal += procedimento.getDuracaoMinutos() * quantidade;
+			valorTotal = valorTotal.add(procedimento.getValorBase().multiply(BigDecimal.valueOf(quantidade)));
+		}
+
+		return new ResumoAgendamento(valorTotal, duracaoTotal);
+	}
+
+	private record ResumoAgendamento(BigDecimal valorTotal, Integer duracaoTotal) {
 	}
 
 	public List<AgendaEventoDTO> listarEventosCalendario(Long tenantId, LocalDateTime inicio, LocalDateTime fim) {

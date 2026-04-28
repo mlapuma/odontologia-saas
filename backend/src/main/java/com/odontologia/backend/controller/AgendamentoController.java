@@ -32,6 +32,11 @@ public class AgendamentoController {
 		return service.detalhar(id);
 	}
 
+	@PutMapping("/{id}")
+	public AgendamentoDetalheResponseDTO atualizar(@PathVariable Long id, @RequestBody AgendamentoRequestDTO dto) {
+		return service.atualizar(id, dto);
+	}
+
 	@GetMapping("/profissional/{profissionalId}")
 	public List<AgendamentoEntity> listarPorProfissional(@RequestParam Long tenantId,
 			@PathVariable Long profissionalId) {

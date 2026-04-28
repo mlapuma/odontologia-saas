@@ -3,6 +3,7 @@ package com.odontologia.backend.service;
 import com.odontologia.backend.dto.WhatsappRequestDTO;
 import com.odontologia.backend.entity.NotificacaoWhatsappEntity;
 import com.odontologia.backend.repository.NotificacaoWhatsappRepository;
+import com.odontologia.backend.security.TenantContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,7 @@ public class WhatsappService {
 	@Transactional
 	public NotificacaoWhatsappEntity enviar(WhatsappRequestDTO dto) {
 		NotificacaoWhatsappEntity notificacao = new NotificacaoWhatsappEntity();
-		notificacao.setTenantId(dto.getTenantId());
+		notificacao.setTenantId(resolverTenantId(dto));
 		notificacao.setPacienteId(dto.getPacienteId());
 		notificacao.setAgendamentoId(dto.getAgendamentoId());
 		notificacao.setTipo(dto.getTipo() == null || dto.getTipo().isBlank() ? "CONFIRMACAO" : dto.getTipo());
@@ -46,12 +47,11 @@ public class WhatsappService {
 		notificacao = repository.save(notificacao);
 
 		try {
-			if (whatsappEnabled) {
-				enviarParaProvider(dto.getTelefone(), dto.getMensagem());
-				notificacao.setResposta("Mensagem enviada pelo provedor configurado");
-			} else {
-				notificacao.setResposta("Mensagem enviada em modo stub");
+			if (!whatsappEnabled) {
+				throw new IllegalStateException("Envio automatico de WhatsApp nao configurado");
 			}
+			enviarParaProvider(dto.getTelefone(), dto.getMensagem());
+			notificacao.setResposta("Mensagem enviada pelo provedor configurado");
 			notificacao.setStatus("ENVIADO");
 			notificacao.setDataEnvio(LocalDateTime.now());
 		} catch (Exception e) {
@@ -60,6 +60,17 @@ public class WhatsappService {
 		}
 
 		return repository.save(notificacao);
+	}
+
+	private Long resolverTenantId(WhatsappRequestDTO dto) {
+		if (dto.getTenantId() != null) {
+			return dto.getTenantId();
+		}
+		Long tenantId = TenantContext.getTenantId();
+		if (tenantId == null) {
+			throw new IllegalStateException("tenantId nao informado");
+		}
+		return tenantId;
 	}
 
 	private void enviarParaProvider(String telefone, String mensagem) throws Exception {

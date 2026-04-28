@@ -26,6 +26,19 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoEntity, 
 	List<AgendamentoEntity> buscarConflitos(Long tenantId, Long profissionalId, LocalDateTime novoInicio,
 			LocalDateTime novoFim);
 
+	@Query("""
+			    select a
+			    from AgendamentoEntity a
+			    where a.tenantId = :tenantId
+			      and a.profissionalId = :profissionalId
+			      and a.id <> :agendamentoId
+			      and a.status <> 'CANCELADO'
+			      and a.dataHoraInicio < :novoFim
+			      and a.dataHoraFim > :novoInicio
+			""")
+	List<AgendamentoEntity> buscarConflitosIgnorandoAgendamento(Long tenantId, Long profissionalId,
+			Long agendamentoId, LocalDateTime novoInicio, LocalDateTime novoFim);
+
 	List<AgendamentoEntity> findByTenantIdAndProfissionalIdAndDataHoraInicioBetweenOrderByDataHoraInicioAsc(
 			Long tenantId, Long profissionalId, LocalDateTime inicio, LocalDateTime fim);
 }

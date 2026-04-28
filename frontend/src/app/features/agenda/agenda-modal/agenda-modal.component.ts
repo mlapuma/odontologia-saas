@@ -80,7 +80,11 @@ export class AgendaModalComponent implements OnChanges {
     };
 
     this.salvando = true;
-    this.agendaService.criar(request).subscribe({
+    const acao = this.agendamentoId
+      ? this.agendaService.atualizar(this.agendamentoId, request)
+      : this.agendaService.criar(request);
+
+    acao.subscribe({
       next: () => {
         this.salvando = false;
         this.salvo.emit();
@@ -159,7 +163,7 @@ export class AgendaModalComponent implements OnChanges {
           dataHoraInicio: this.paraInputDateTime(detalhe.dataHoraInicio),
           procedimentoId: procedimento?.procedimentoId || null,
           quantidade: procedimento?.quantidade || 1,
-          observacoes: ''
+          observacoes: detalhe.observacoes || ''
         };
         this.carregando = false;
       },
