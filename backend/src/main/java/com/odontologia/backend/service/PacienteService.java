@@ -36,6 +36,7 @@ public class PacienteService {
 		PacienteEntity existente = buscar(id);
 
 		existente.setNome(paciente.getNome());
+		existente.setCpf(paciente.getCpf());
 		existente.setTelefone(paciente.getTelefone());
 		existente.setWhatsapp(paciente.getWhatsapp());
 		existente.setEmail(paciente.getEmail());
@@ -44,6 +45,7 @@ public class PacienteService {
 		existente.setComplemento(paciente.getComplemento());
 		existente.setBairro(paciente.getBairro());
 		existente.setCep(paciente.getCep());
+		existente.setDataNascimento(paciente.getDataNascimento());
 		existente.setCidade(paciente.getCidade());
 		existente.setUf(paciente.getUf());
 

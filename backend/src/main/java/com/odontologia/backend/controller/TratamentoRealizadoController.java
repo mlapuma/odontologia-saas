@@ -39,6 +39,11 @@ public class TratamentoRealizadoController {
 		service.excluir(TenantContext.getTenantId(), id);
 	}
 
+	@PostMapping("/{id}/finalizar")
+	public TratamentoRealizadoEntity finalizar(@PathVariable Long id) {
+		return service.finalizar(TenantContext.getTenantId(), id);
+	}
+
 	@GetMapping("/pacientes-reativacao")
 	public List<PacienteReativacaoDTO> pacientesParaReativacao(
 			@RequestParam(defaultValue = "180") int diasSemComparecer) {

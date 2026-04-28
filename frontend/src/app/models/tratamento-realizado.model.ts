@@ -4,8 +4,16 @@ export interface TratamentoRealizado {
   pacienteId: number;
   procedimentoId?: number | null;
   tratamento: string;
+  dente?: string | null;
+  valorTratamento?: number;
+  valorTotal: number;
   valorPago: number;
+  saldo?: number;
+  formaPagamento?: string | null;
+  parcelas?: number | null;
   dataRealizacao: string;
+  finalizado?: boolean;
+  dataFinalizacao?: string | null;
   observacoes?: string;
 }
 

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface TratamentoRealizadoRepository extends JpaRepository<TratamentoRealizadoEntity, Long> {
@@ -15,6 +16,17 @@ public interface TratamentoRealizadoRepository extends JpaRepository<TratamentoR
 
 	List<TratamentoRealizadoEntity> findByTenantIdAndPacienteIdOrderByDataRealizacaoDescCreatedAtDesc(Long tenantId,
 			Long pacienteId);
+
+	@Query("""
+			select coalesce(sum(t.valorPago), 0)
+			from TratamentoRealizadoEntity t
+			where t.tenantId = :tenantId
+			  and t.pacienteId = :pacienteId
+			  and (:tratamentoId is null or t.id <> :tratamentoId)
+			  and (t.finalizado is null or t.finalizado = false)
+			""")
+	BigDecimal totalPagoPacienteExcluindoTratamento(@Param("tenantId") Long tenantId,
+			@Param("pacienteId") Long pacienteId, @Param("tratamentoId") Long tratamentoId);
 
 	@Query("""
 			select new com.odontologia.backend.dto.PacienteReativacaoDTO(

@@ -62,6 +62,25 @@
   border-radius: var(--radius);
 }
 
+.campo-com-ajuda {
+  min-width: 0;
+}
+
+.campo-com-ajuda small {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-success);
+  font-size: 12px;
+}
+
+.campo-com-ajuda small.erro-cep {
+  color: var(--color-danger);
+}
+
+.uf-uppercase {
+  text-transform: uppercase;
+}
+
 .acoes-form,
 .filtro-lista,
 .acoes-tabela {

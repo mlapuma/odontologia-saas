@@ -25,11 +25,32 @@ public class TratamentoRealizadoEntity {
 	@Column(nullable = false)
 	private String tratamento;
 
+	private String dente;
+
 	@Column(name = "valor_pago", nullable = false)
 	private BigDecimal valorPago;
 
+	@Column(name = "valor_tratamento", nullable = false)
+	private BigDecimal valorTratamento;
+
+	@Column(name = "valor_total", nullable = false)
+	private BigDecimal valorTotal;
+
+	private BigDecimal saldo;
+
+	@Column(name = "forma_pagamento")
+	private String formaPagamento;
+
+	@Column(name = "parcelas")
+	private Integer parcelas;
+
 	@Column(name = "data_realizacao", nullable = false)
 	private LocalDate dataRealizacao;
+
+	private Boolean finalizado;
+
+	@Column(name = "data_finalizacao")
+	private LocalDateTime dataFinalizacao;
 
 	private String observacoes;
 
@@ -44,6 +65,9 @@ public class TratamentoRealizadoEntity {
 		createdAt = LocalDateTime.now();
 		if (dataRealizacao == null) {
 			dataRealizacao = LocalDate.now();
+		}
+		if (finalizado == null) {
+			finalizado = false;
 		}
 	}
 
@@ -88,6 +112,14 @@ public class TratamentoRealizadoEntity {
 		this.tratamento = tratamento;
 	}
 
+	public String getDente() {
+		return dente;
+	}
+
+	public void setDente(String dente) {
+		this.dente = dente;
+	}
+
 	public BigDecimal getValorPago() {
 		return valorPago;
 	}
@@ -96,12 +128,68 @@ public class TratamentoRealizadoEntity {
 		this.valorPago = valorPago;
 	}
 
+	public BigDecimal getValorTratamento() {
+		return valorTratamento;
+	}
+
+	public void setValorTratamento(BigDecimal valorTratamento) {
+		this.valorTratamento = valorTratamento;
+	}
+
+	public BigDecimal getValorTotal() {
+		return valorTotal;
+	}
+
+	public void setValorTotal(BigDecimal valorTotal) {
+		this.valorTotal = valorTotal;
+	}
+
+	public BigDecimal getSaldo() {
+		return saldo;
+	}
+
+	public void setSaldo(BigDecimal saldo) {
+		this.saldo = saldo;
+	}
+
+	public String getFormaPagamento() {
+		return formaPagamento;
+	}
+
+	public void setFormaPagamento(String formaPagamento) {
+		this.formaPagamento = formaPagamento;
+	}
+
+	public Integer getParcelas() {
+		return parcelas;
+	}
+
+	public void setParcelas(Integer parcelas) {
+		this.parcelas = parcelas;
+	}
+
 	public LocalDate getDataRealizacao() {
 		return dataRealizacao;
 	}
 
 	public void setDataRealizacao(LocalDate dataRealizacao) {
 		this.dataRealizacao = dataRealizacao;
+	}
+
+	public Boolean getFinalizado() {
+		return finalizado;
+	}
+
+	public void setFinalizado(Boolean finalizado) {
+		this.finalizado = finalizado;
+	}
+
+	public LocalDateTime getDataFinalizacao() {
+		return dataFinalizacao;
+	}
+
+	public void setDataFinalizacao(LocalDateTime dataFinalizacao) {
+		this.dataFinalizacao = dataFinalizacao;
 	}
 
 	public String getObservacoes() {

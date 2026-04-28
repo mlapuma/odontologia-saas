@@ -5,6 +5,8 @@ import com.odontologia.backend.dto.DashboardResumoDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class GoogleBusinessProfileService {
+
+	private static final Logger logger = LoggerFactory.getLogger(GoogleBusinessProfileService.class);
 
 	private static final String AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 	private static final String TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -94,6 +98,11 @@ public class GoogleBusinessProfileService {
 
 	public DashboardResumoDTO.GoogleBusinessProfileDTO obterResumoPerformance() {
 		if (cacheValido()) {
+			logger.info("Google Business Profile: retornando resumo em cache. metricasDisponiveis={}, busca={}, maps={}, ligacoes={}, rotas={}, site={}, termos={}",
+					resumoCache.isMetricasDisponiveis(), resumoCache.getVisualizacoesBusca(),
+					resumoCache.getVisualizacoesMaps(), resumoCache.getCliquesTelefone(),
+					resumoCache.getPedidosRota(), resumoCache.getCliquesSite(),
+					resumoCache.getTermosPesquisa().size());
 			return resumoCache;
 		}
 
@@ -105,19 +114,23 @@ public class GoogleBusinessProfileService {
 
 		if (!status.isConfigurado()) {
 			google.setMensagem("Conecte o Perfil da Empresa no Google para acompanhar visualizações, ligações, rotas e termos pesquisados.");
+			logger.info("Google Business Profile: credenciais OAuth nao configuradas.");
 			return google;
 		}
 
 		if (!status.isAutorizado()) {
 			google.setMensagem("Autorize a conta Google na tela de Integrações para buscar as métricas da clínica.");
+			logger.info("Google Business Profile: credenciais configuradas, mas conta ainda nao autorizada.");
 			return google;
 		}
 
 		try {
+			logger.info("Google Business Profile: iniciando consulta de performance.");
 			String accessToken = obterAccessToken();
 			Optional<GoogleLocation> location = primeiraLocalizacao(accessToken);
 			if (location.isEmpty()) {
 				google.setMensagem("Nenhum perfil de empresa foi encontrado para a conta Google autorizada.");
+				logger.warn("Google Business Profile: nenhuma localizacao encontrada para a conta autorizada.");
 				return google;
 			}
 
@@ -128,11 +141,16 @@ public class GoogleBusinessProfileService {
 			google.setMensagem("Métricas carregadas do Google Business Profile.");
 			google.setMetricasDisponiveis(true);
 			atualizarCache(google);
+			logger.info("Google Business Profile: metricas carregadas. localizacao='{}', busca={}, maps={}, ligacoes={}, rotas={}, site={}, termos={}",
+					google.getLocalizacao(), google.getVisualizacoesBusca(), google.getVisualizacoesMaps(),
+					google.getCliquesTelefone(), google.getPedidosRota(), google.getCliquesSite(),
+					google.getTermosPesquisa().size());
 			return google;
 		} catch (RuntimeException ex) {
 			google.setMensagem(mensagemAmigavelGoogle(ex.getMessage()));
 			google.setMetricasDisponiveis(false);
 			atualizarCache(google);
+			logger.warn("Google Business Profile: falha ao carregar metricas. mensagem='{}'", google.getMensagem());
 			return google;
 		}
 	}

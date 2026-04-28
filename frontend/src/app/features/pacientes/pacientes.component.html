@@ -26,20 +26,24 @@
 
         <div class="campos">
             <input [(ngModel)]="pacienteForm.nome" placeholder="Nome" />
-            <input [(ngModel)]="pacienteForm.cpf" placeholder="CPF" />
-            <input [(ngModel)]="pacienteForm.telefone" placeholder="Telefone" />
-            <input [(ngModel)]="pacienteForm.whatsapp" placeholder="WhatsApp" />
+            <input [ngModel]="pacienteForm.cpf" (ngModelChange)="aoAlterarCpf($event)" placeholder="CPF" inputmode="numeric" maxlength="14" />
+            <input [ngModel]="pacienteForm.telefone" (ngModelChange)="aoAlterarTelefone('telefone', $event)" placeholder="Telefone" inputmode="tel" maxlength="15" />
+            <input [ngModel]="pacienteForm.whatsapp" (ngModelChange)="aoAlterarTelefone('whatsapp', $event)" placeholder="WhatsApp" inputmode="tel" maxlength="15" />
             <input [(ngModel)]="pacienteForm.email" placeholder="E-mail" />
             <input [(ngModel)]="pacienteForm.dataNascimento" type="date" placeholder="Data de nascimento" />
+            <div class="campo-com-ajuda">
+                <input [ngModel]="pacienteForm.cep" (ngModelChange)="aoAlterarCep($event)" (blur)="consultarCep()" placeholder="CEP" inputmode="numeric" maxlength="9" />
+                <small *ngIf="mensagemCep" [class.erro-cep]="mensagemCep.includes('não') || mensagemCep.includes('Não')">
+                    {{ mensagemCep }}
+                </small>
+            </div>
             <input [(ngModel)]="pacienteForm.endereco" placeholder="Endereço" />
             <input [(ngModel)]="pacienteForm.numero" placeholder="Número" />
             <input [(ngModel)]="pacienteForm.complemento" placeholder="Complemento" />
             <input [(ngModel)]="pacienteForm.bairro" placeholder="Bairro" />
-            <input [(ngModel)]="pacienteForm.cep" placeholder="CEP" />
             <input [(ngModel)]="pacienteForm.cidade" placeholder="Cidade" />
-            <input [(ngModel)]="pacienteForm.uf" placeholder="UF" maxlength="2" />
+            <input [(ngModel)]="pacienteForm.uf" placeholder="UF" maxlength="2" class="uf-uppercase" />
         </div>
-
         <div class="acoes-form">
             <button class="btn-primary" (click)="salvar()">
                 {{ editando ? 'Atualizar paciente' : 'Salvar paciente' }}

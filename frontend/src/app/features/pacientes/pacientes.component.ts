@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Paciente } from '../../models/paciente.model';
+import { CepService } from '../../services/cep.service';
 import { PacienteService } from '../../services/paciente.service';
 
 
@@ -22,11 +23,17 @@ export class PacientesComponent implements OnInit {
   carregando = false;
   mensagem = '';
   erro = '';
+  mensagemCep = '';
+  carregandoCep = false;
   filtro = '';
   paginaAtual = 1;
   itensPorPagina = 10;
+  private ultimoCepConsultado = '';
 
-  constructor(private pacienteService: PacienteService) { }
+  constructor(
+    private pacienteService: PacienteService,
+    private cepService: CepService
+  ) { }
 
   ngOnInit(): void {
     this.listar();
@@ -83,11 +90,13 @@ export class PacientesComponent implements OnInit {
   }
 
   editar(paciente: Paciente): void {
-    this.pacienteForm = { ...paciente };
+    this.pacienteForm = this.aplicarMascarasPaciente({ ...paciente });
     this.editando = true;
     this.exibindoFormulario = true;
     this.mensagem = '';
     this.erro = '';
+    this.mensagemCep = '';
+    this.ultimoCepConsultado = this.somenteNumeros(this.pacienteForm.cep);
   }
 
   novo(): void {
@@ -96,6 +105,8 @@ export class PacientesComponent implements OnInit {
     this.exibindoFormulario = true;
     this.mensagem = '';
     this.erro = '';
+    this.mensagemCep = '';
+    this.ultimoCepConsultado = '';
   }
 
   excluir(id?: number): void {
@@ -123,6 +134,58 @@ export class PacientesComponent implements OnInit {
     this.pacienteForm = this.novoPaciente();
     this.editando = false;
     this.exibindoFormulario = false;
+    this.mensagemCep = '';
+    this.ultimoCepConsultado = '';
+  }
+
+  aoAlterarCpf(valor: string): void {
+    this.pacienteForm.cpf = this.formatarCpf(valor);
+  }
+
+  aoAlterarTelefone(campo: 'telefone' | 'whatsapp', valor: string): void {
+    this.pacienteForm[campo] = this.formatarTelefone(valor);
+  }
+
+  aoAlterarCep(valor: string): void {
+    this.pacienteForm.cep = this.formatarCep(valor);
+    this.mensagemCep = '';
+
+    const cepLimpo = this.somenteNumeros(this.pacienteForm.cep);
+    if (cepLimpo.length === 8 && cepLimpo !== this.ultimoCepConsultado) {
+      this.consultarCep();
+    }
+  }
+
+  consultarCep(): void {
+    const cepLimpo = this.somenteNumeros(this.pacienteForm.cep);
+    if (cepLimpo.length !== 8 || this.carregandoCep) {
+      return;
+    }
+
+    this.carregandoCep = true;
+    this.mensagemCep = 'Buscando CEP...';
+    this.ultimoCepConsultado = cepLimpo;
+
+    this.cepService.consultar(cepLimpo).subscribe({
+      next: (response) => {
+        this.carregandoCep = false;
+
+        if (response.erro) {
+          this.mensagemCep = 'CEP não encontrado.';
+          return;
+        }
+
+        this.pacienteForm.endereco = response.logradouro || this.pacienteForm.endereco;
+        this.pacienteForm.bairro = response.bairro || this.pacienteForm.bairro;
+        this.pacienteForm.cidade = response.localidade || this.pacienteForm.cidade;
+        this.pacienteForm.uf = (response.uf || this.pacienteForm.uf || '').toUpperCase();
+        this.mensagemCep = 'Endereço preenchido pelo CEP.';
+      },
+      error: () => {
+        this.carregandoCep = false;
+        this.mensagemCep = 'Não foi possível consultar o CEP agora.';
+      }
+    });
   }
 
   limparFiltro(): void {
@@ -203,6 +266,48 @@ export class PacientesComponent implements OnInit {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .trim();
+  }
+
+  private aplicarMascarasPaciente(paciente: Paciente): Paciente {
+    return {
+      ...paciente,
+      cpf: this.formatarCpf(paciente.cpf),
+      telefone: this.formatarTelefone(paciente.telefone),
+      whatsapp: this.formatarTelefone(paciente.whatsapp),
+      cep: this.formatarCep(paciente.cep),
+      uf: (paciente.uf || '').toUpperCase()
+    };
+  }
+
+  private formatarCpf(valor?: string): string {
+    const numeros = this.somenteNumeros(valor).slice(0, 11);
+    return numeros
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  }
+
+  private formatarTelefone(valor?: string): string {
+    const numeros = this.somenteNumeros(valor).slice(0, 11);
+    if (numeros.length <= 10) {
+      return numeros
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+    }
+
+    return numeros
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2');
+  }
+
+  private formatarCep(valor?: string): string {
+    return this.somenteNumeros(valor)
+      .slice(0, 8)
+      .replace(/(\d{5})(\d)/, '$1-$2');
+  }
+
+  private somenteNumeros(valor?: string): string {
+    return (valor || '').replace(/\D/g, '');
   }
 
   private novoPaciente(): Paciente {

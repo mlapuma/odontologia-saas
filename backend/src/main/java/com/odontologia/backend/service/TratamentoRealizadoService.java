@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,7 +37,7 @@ public class TratamentoRealizadoService {
 	public TratamentoRealizadoEntity criar(Long tenantId, TratamentoRealizadoRequestDTO dto) {
 		TratamentoRealizadoEntity tratamento = new TratamentoRealizadoEntity();
 		tratamento.setTenantId(tenantId);
-		preencherTratamento(tratamento, dto);
+		preencherTratamento(tenantId, tratamento, dto);
 
 		return repository.save(tratamento);
 	}
@@ -48,7 +49,7 @@ public class TratamentoRealizadoService {
 			throw new RuntimeException("Tratamento nao encontrado.");
 		}
 
-		preencherTratamento(tratamento, dto);
+		preencherTratamento(tenantId, tratamento, dto);
 		return repository.save(tratamento);
 	}
 
@@ -62,19 +63,54 @@ public class TratamentoRealizadoService {
 		repository.delete(tratamento);
 	}
 
-	private void preencherTratamento(TratamentoRealizadoEntity tratamento, TratamentoRealizadoRequestDTO dto) {
+	@Transactional
+	public TratamentoRealizadoEntity finalizar(Long tenantId, Long id) {
+		TratamentoRealizadoEntity tratamento = repository.findById(id).orElseThrow();
+		if (!tratamento.getTenantId().equals(tenantId)) {
+			throw new RuntimeException("Tratamento nao encontrado.");
+		}
+
+		tratamento.setFinalizado(true);
+		tratamento.setDataFinalizacao(LocalDateTime.now());
+		return repository.save(tratamento);
+	}
+
+	private void preencherTratamento(Long tenantId, TratamentoRealizadoEntity tratamento, TratamentoRealizadoRequestDTO dto) {
 		if (dto.getPacienteId() == null) {
 			throw new RuntimeException("Paciente e obrigatorio.");
 		}
 		if (dto.getValorPago() == null || dto.getValorPago().compareTo(BigDecimal.ZERO) < 0) {
 			throw new RuntimeException("Valor pago deve ser informado.");
 		}
+		BigDecimal valorTratamento = dto.getValorTratamento() == null ? BigDecimal.ZERO : dto.getValorTratamento();
+		if (valorTratamento.compareTo(BigDecimal.ZERO) < 0) {
+			throw new RuntimeException("Valor do tratamento deve ser informado.");
+		}
+		BigDecimal valorTotal = dto.getValorTotal() == null ? valorTratamento : dto.getValorTotal();
+		if (valorTotal.compareTo(BigDecimal.ZERO) < 0) {
+			throw new RuntimeException("Valor total deve ser informado.");
+		}
+		BigDecimal totalPagoAnterior = repository.totalPagoPacienteExcluindoTratamento(tenantId, dto.getPacienteId(),
+				tratamento.getId());
+		BigDecimal totalPagoAtualizado = totalPagoAnterior.add(dto.getValorPago());
+		if (totalPagoAtualizado.compareTo(valorTotal) > 0) {
+			throw new RuntimeException("A soma dos pagamentos nao pode ser maior que o valor total da avaliacao.");
+		}
 
 		tratamento.setPacienteId(dto.getPacienteId());
 		tratamento.setProcedimentoId(dto.getProcedimentoId());
 		tratamento.setTratamento(resolveTratamento(dto));
+		tratamento.setDente(normalizarDente(dto.getDente()));
 		tratamento.setValorPago(dto.getValorPago());
+		tratamento.setValorTratamento(valorTratamento);
+		tratamento.setValorTotal(valorTotal);
+		tratamento.setSaldo(valorTotal.subtract(totalPagoAtualizado));
+		tratamento.setFormaPagamento(normalizarTexto(dto.getFormaPagamento()));
+		tratamento.setParcelas(normalizarParcelas(dto));
 		tratamento.setDataRealizacao(dto.getDataRealizacao() == null ? LocalDate.now() : dto.getDataRealizacao());
+		if (tratamento.getFinalizado() == null) {
+			tratamento.setFinalizado(false);
+		}
 		tratamento.setObservacoes(dto.getObservacoes());
 	}
 
@@ -93,5 +129,26 @@ public class TratamentoRealizadoService {
 					.orElseThrow(() -> new RuntimeException("Procedimento nao encontrado."));
 		}
 		throw new RuntimeException("Informe o tratamento ou selecione um procedimento.");
+	}
+
+	private String normalizarDente(String dente) {
+		return normalizarTexto(dente);
+	}
+
+	private String normalizarTexto(String valor) {
+		if (valor == null || valor.trim().isEmpty()) {
+			return null;
+		}
+		return valor.trim();
+	}
+
+	private Integer normalizarParcelas(TratamentoRealizadoRequestDTO dto) {
+		if (!"CARTAO_CREDITO_PARCELADO".equals(dto.getFormaPagamento())) {
+			return null;
+		}
+		if (dto.getParcelas() == null || dto.getParcelas() < 2) {
+			throw new RuntimeException("Informe a quantidade de parcelas do cartao de credito.");
+		}
+		return dto.getParcelas();
 	}
 }

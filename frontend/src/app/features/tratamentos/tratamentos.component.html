@@ -7,9 +7,14 @@
         Visualizando tratamentos de {{ nomePaciente(pacienteIdFiltro) }}.
       </p>
     </div>
-    <button class="btn-novo" type="button" (click)="novoTratamento()" *ngIf="!formularioAberto">
-      Novo tratamento
-    </button>
+    <div class="cabecalho-acoes" *ngIf="!formularioAberto">
+      <button class="btn-historico" type="button" (click)="alternarHistorico()">
+        {{ historicoAberto ? 'Ocultar valores' : 'Exibir valores' }}
+      </button>
+      <button class="btn-novo" type="button" (click)="novoTratamento()">
+        Novo tratamento
+      </button>
+    </div>
   </div>
 
   <div class="mensagens">
@@ -31,7 +36,7 @@
       <div class="campos">
         <label>
           Paciente
-          <select [(ngModel)]="form.pacienteId">
+          <select [(ngModel)]="form.pacienteId" (ngModelChange)="aoSelecionarPaciente()">
             <option [ngValue]="null">Selecione</option>
             <option *ngFor="let paciente of pacientes" [ngValue]="paciente.id">{{ paciente.nome }}</option>
           </select>
@@ -39,32 +44,70 @@
 
         <label>
           Procedimento
-          <select [ngModel]="form.procedimentoSelecao" (ngModelChange)="selecionarProcedimento($event)">
-            <option value="">Opcional</option>
-            <optgroup label="Procedimentos cadastrados" *ngIf="procedimentos.length > 0">
-              <option *ngFor="let procedimento of procedimentos" [value]="'procedimento-' + procedimento.id">
-                {{ procedimento.nome }}
-              </option>
-            </optgroup>
-            <optgroup label="Procedimentos odontol&oacute;gicos">
-              <option *ngFor="let procedimento of tratamentosOdontologicos" [value]="'padrao-' + procedimento">
-                {{ procedimento }}
-              </option>
+          <span class="campo-com-limpar">
+            <input
+              list="opcoes-procedimentos"
+              [(ngModel)]="form.procedimentoBusca"
+              (ngModelChange)="selecionarProcedimentoPorTexto($event)"
+              placeholder="Digite ou selecione o procedimento"
+            />
+            <button
+              class="btn-limpar-campo"
+              type="button"
+              title="Limpar procedimento"
+              aria-label="Limpar procedimento"
+              (click)="limparProcedimento()"
+              *ngIf="form.procedimentoBusca"
+            >
+              x
+            </button>
+          </span>
+          <datalist id="opcoes-procedimentos">
+            <option *ngFor="let procedimento of tratamentosParaSelecao" [value]="procedimento"></option>
+          </datalist>
+        </label>
+
+        <label>
+          Dente
+          <select [(ngModel)]="form.dente">
+            <option value="">Nao se aplica / arcada toda</option>
+            <optgroup *ngFor="let grupo of dentesArcada" [label]="grupo.grupo">
+              <option *ngFor="let dente of grupo.dentes" [value]="dente">Dente {{ dente }}</option>
             </optgroup>
           </select>
         </label>
 
         <label>
-          Tratamento descrito no documento
-          <input [(ngModel)]="form.tratamento" list="opcoes-tratamentos" placeholder="Selecione ou digite o tratamento" />
-          <datalist id="opcoes-tratamentos">
-            <option *ngFor="let tratamento of tratamentosParaSelecao" [value]="tratamento"></option>
-          </datalist>
+          Valor do tratamento
+          <input type="number" min="0" step="0.01" [(ngModel)]="form.valorTratamento" />
         </label>
 
         <label>
-          Valor pago no dia
+          Valor total da avaliacao
+          <input type="number" min="0" step="0.01" [(ngModel)]="form.valorTotal" />
+        </label>
+
+        <label>
+          Valor pago
           <input type="number" min="0" step="0.01" [(ngModel)]="form.valorPago" />
+        </label>
+
+        <label>
+          Valor restante da avaliacao
+          <input type="number" [value]="saldoTratamento" readonly />
+        </label>
+
+        <label>
+          Forma de pagamento
+          <select [(ngModel)]="form.formaPagamento" (ngModelChange)="aoAlterarFormaPagamento()">
+            <option value="">Selecione</option>
+            <option *ngFor="let forma of formasPagamento" [value]="forma.valor">{{ forma.label }}</option>
+          </select>
+        </label>
+
+        <label *ngIf="form.formaPagamento === 'CARTAO_CREDITO_PARCELADO'">
+          Parcelas
+          <input type="number" min="2" max="24" step="1" [(ngModel)]="form.parcelas" />
         </label>
 
         <label>
@@ -72,10 +115,25 @@
           <input type="date" [(ngModel)]="form.dataRealizacao" />
         </label>
 
-        <label>
+        <label class="campo-observacoes">
           Observa&ccedil;&otilde;es
           <textarea rows="3" [(ngModel)]="form.observacoes"></textarea>
         </label>
+      </div>
+
+      <div class="resumo-tratamentos resumo-formulario">
+        <div>
+          <span>Soma dos procedimentos</span>
+          <strong>{{ valorProcedimentosPacienteFormulario | currency:'BRL' }}</strong>
+        </div>
+        <div>
+          <span>Total pago no plano</span>
+          <strong>{{ valorPagoPacienteFormulario | currency:'BRL' }}</strong>
+        </div>
+        <div>
+          <span>Diferen&ccedil;a para fechar</span>
+          <strong>{{ diferencaAvaliacaoFormulario | currency:'BRL' }}</strong>
+        </div>
       </div>
 
       <button class="btn-primary" type="button" (click)="salvarTratamento()" [disabled]="salvando">
@@ -98,14 +156,53 @@
         </label>
       </div>
 
+      <div class="resumo-tratamentos" *ngIf="historicoAberto">
+        <div>
+          <span>Valor total da avaliacao</span>
+          <strong>{{ valorTotalAvaliacaoTratamentos | currency:'BRL' }}</strong>
+        </div>
+        <div>
+          <span>Soma dos procedimentos</span>
+          <strong>{{ valorTotalTratamentos | currency:'BRL' }}</strong>
+        </div>
+        <div>
+          <span>Valor pago</span>
+          <strong>{{ valorPagoTratamentos | currency:'BRL' }}</strong>
+        </div>
+        <div>
+          <span>Valor restante</span>
+          <strong>{{ valorRestanteTratamentos | currency:'BRL' }}</strong>
+        </div>
+      </div>
+
       <div class="tabela-scroll">
         <table>
+          <colgroup>
+            <col class="col-data" />
+            <col class="col-paciente" />
+            <col class="col-tratamento" />
+            <col class="col-dente" />
+            <col class="col-valor" />
+            <col class="col-valor" />
+            <col class="col-valor" />
+            <col class="col-valor" />
+            <col class="col-forma" />
+            <col class="col-status" />
+            <col class="col-observacoes" />
+            <col class="col-acoes" />
+          </colgroup>
           <thead>
             <tr>
               <th>Data</th>
               <th>Paciente</th>
               <th>Tratamento</th>
+              <th>Dente</th>
+              <th>Valor total</th>
+              <th>Valor trat.</th>
               <th>Valor pago</th>
+              <th>Restante</th>
+              <th>Forma</th>
+              <th>Status</th>
               <th>Observa&ccedil;&otilde;es</th>
               <th>A&ccedil;&otilde;es</th>
             </tr>
@@ -115,15 +212,38 @@
               <td>{{ tratamento.dataRealizacao | date:'dd/MM/yyyy' }}</td>
               <td>{{ nomePaciente(tratamento.pacienteId) }}</td>
               <td>{{ tratamento.tratamento }}</td>
+              <td>{{ tratamento.dente || '-' }}</td>
+              <td>{{ tratamento.valorTotal | currency:'BRL' }}</td>
+              <td>{{ tratamento.valorTratamento | currency:'BRL' }}</td>
               <td>{{ tratamento.valorPago | currency:'BRL' }}</td>
+              <td>{{ tratamento.saldo | currency:'BRL' }}</td>
+              <td>
+                {{ tratamento.formaPagamento || '-' }}
+                <span *ngIf="tratamento.parcelas">({{ tratamento.parcelas }}x)</span>
+              </td>
+              <td>
+                <span class="status-finalizado" *ngIf="tratamento.finalizado">Finalizado</span>
+                <span class="status-aberto" *ngIf="!tratamento.finalizado">Aberto</span>
+              </td>
               <td>{{ tratamento.observacoes }}</td>
               <td class="acoes">
-                <button class="btn-editar" type="button" (click)="editarTratamento(tratamento)">Editar</button>
-                <button class="btn-excluir" type="button" (click)="excluirTratamento(tratamento)">Excluir</button>
+                <ng-container *ngIf="!tratamento.finalizado; else tratamentoBloqueado">
+                  <button class="btn-editar" type="button" (click)="editarTratamento(tratamento)">Editar</button>
+                  <button class="btn-finalizar" type="button" (click)="finalizarTratamento(tratamento)">
+                    Finalizar
+                  </button>
+                  <button class="btn-excluir" type="button" (click)="excluirTratamento(tratamento)">Excluir</button>
+                </ng-container>
+                <ng-template #tratamentoBloqueado>
+                  <button class="btn-bloqueado" type="button" disabled title="Tratamento finalizado">
+                    <span aria-hidden="true">&#128274;</span>
+                    Finalizado
+                  </button>
+                </ng-template>
               </td>
             </tr>
             <tr *ngIf="tratamentosFiltrados.length === 0">
-              <td colspan="6">Nenhum tratamento registrado ainda.</td>
+              <td colspan="12">Nenhum tratamento registrado ainda.</td>
             </tr>
           </tbody>
         </table>
