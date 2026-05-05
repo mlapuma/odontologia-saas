@@ -1,2 +1,5 @@
 .tools/
 scanner-tests/
+.env
+.env.*
+!.env.example
