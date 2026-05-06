@@ -91,6 +91,7 @@
 .historico-cabecalho {
   display: flex;
   align-items: end;
+  flex-direction: row-reverse;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
@@ -224,6 +225,11 @@ button {
   padding: 9px 12px;
 }
 
+.acoes button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .btn-editar {
   color: #7b560c;
   background: #fbf4e5;
@@ -259,7 +265,7 @@ button {
 
 table {
   width: 100%;
-  min-width: 1580px;
+  min-width: 1640px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -281,23 +287,23 @@ table {
 }
 
 .col-valor {
-  width: 108px;
+  width: 118px;
 }
 
 .col-forma {
-  width: 130px;
+  width: 170px;
 }
 
 .col-status {
-  width: 105px;
+  width: 120px;
 }
 
 .col-observacoes {
-  width: 250px;
+  width: 270px;
 }
 
 .col-acoes {
-  width: 260px;
+  width: 190px;
 }
 
 th,
@@ -324,17 +330,22 @@ td:nth-child(6),
 td:nth-child(7),
 td:nth-child(8),
 td:nth-child(9),
-td:nth-child(10),
 th:nth-child(1),
 th:nth-child(4),
 th:nth-child(5),
 th:nth-child(6),
 th:nth-child(7),
 th:nth-child(8),
-th:nth-child(9),
 th:nth-child(10),
+th:nth-child(11),
 th:nth-child(12) {
   white-space: nowrap;
+}
+
+td:nth-child(9),
+td:nth-child(10) {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 td:nth-child(11),
@@ -354,13 +365,65 @@ tbody tr {
   background: #fff;
 }
 
+.linha-tratamento {
+  cursor: pointer;
+}
+
+.linha-tratamento:hover,
+.linha-tratamento.selecionado {
+  background: #fff7e4;
+}
+
+.aviso-filtro {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+  background: #fffaf0;
+}
+
+.acoes-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #fffaf0;
+}
+
+.acoes-rodape span,
+.acoes-rodape small {
+  display: block;
+  color: var(--color-muted);
+}
+
+.acoes-rodape strong {
+  color: #4b2f05;
+}
+
+.acoes-rodape .acoes {
+  margin-left: auto;
+}
+
+.acoes-linha {
+  min-width: 0;
+}
+
+.finalizado-geral {
+  justify-content: space-between;
+}
+
 @media (max-width: 980px) {
   .grid-tratamentos {
     grid-template-columns: 1fr;
   }
 
   table {
-    min-width: 1180px;
+    min-width: 1360px;
   }
 }
 
@@ -385,6 +448,11 @@ tbody tr {
 
   .resumo-tratamentos {
     grid-template-columns: 1fr;
+  }
+
+  .acoes-rodape {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .grid-tratamentos.apenas-formulario .campos {

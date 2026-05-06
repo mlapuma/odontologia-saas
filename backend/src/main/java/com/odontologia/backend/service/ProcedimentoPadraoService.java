@@ -19,6 +19,10 @@ public class ProcedimentoPadraoService {
 			"Clareamento dental",
 			"Restauração em resina",
 			"Restauração em amálgama",
+			"Remocao de carie + curativo",
+			"Exo",
+			"Medicacao",
+			"Moldagem",
 			"Tratamento de canal",
 			"Retratamento de canal",
 			"Extração dentária",
@@ -56,6 +60,65 @@ public class ProcedimentoPadraoService {
 	public List<ProcedimentoEntity> listarComPadroes(Long tenantId) {
 		garantirPadroes(tenantId);
 		return repository.findByTenantId(tenantId);
+	}
+
+	public ProcedimentoEntity atualizarValor(Long tenantId, Long id, BigDecimal valorBase) {
+		if (valorBase == null || valorBase.compareTo(BigDecimal.ZERO) < 0) {
+			throw new RuntimeException("Valor do procedimento deve ser maior ou igual a zero.");
+		}
+
+		ProcedimentoEntity procedimento = repository.findById(id).orElseThrow();
+		if (!procedimento.getTenantId().equals(tenantId)) {
+			throw new RuntimeException("Procedimento nao encontrado.");
+		}
+
+		procedimento.setValorBase(valorBase);
+		return repository.save(procedimento);
+	}
+
+	public ProcedimentoEntity salvar(Long tenantId, ProcedimentoRequest request) {
+		String nome = normalizarNome(request.nome());
+		BigDecimal valorBase = normalizarValor(request.valorBase());
+		ProcedimentoEntity procedimento = request.id() == null
+				? new ProcedimentoEntity()
+				: repository.findById(request.id()).orElseThrow();
+
+		if (procedimento.getId() == null) {
+			if (repository.findByTenantIdAndNomeIgnoreCase(tenantId, nome).isPresent()) {
+				throw new RuntimeException("Ja existe um procedimento com este nome.");
+			}
+			procedimento.setTenantId(tenantId);
+			procedimento.setAtivo(true);
+			procedimento.setDuracaoMinutos(45);
+			procedimento.setCategoria("Odontologia");
+		} else if (!procedimento.getTenantId().equals(tenantId)) {
+			throw new RuntimeException("Procedimento nao encontrado.");
+		}
+
+		procedimento.setNome(nome);
+		procedimento.setValorBase(valorBase);
+		if (request.categoria() != null && !request.categoria().trim().isEmpty()) {
+			procedimento.setCategoria(request.categoria().trim());
+		}
+		return repository.save(procedimento);
+	}
+
+	private String normalizarNome(String nome) {
+		if (nome == null || nome.trim().isEmpty()) {
+			throw new RuntimeException("Nome do procedimento e obrigatorio.");
+		}
+		return nome.trim();
+	}
+
+	private BigDecimal normalizarValor(BigDecimal valorBase) {
+		BigDecimal valor = valorBase == null ? BigDecimal.ZERO : valorBase;
+		if (valor.compareTo(BigDecimal.ZERO) < 0) {
+			throw new RuntimeException("Valor do procedimento deve ser maior ou igual a zero.");
+		}
+		return valor;
+	}
+
+	public record ProcedimentoRequest(Long id, String nome, BigDecimal valorBase, String categoria) {
 	}
 
 	private void garantirPadroes(Long tenantId) {

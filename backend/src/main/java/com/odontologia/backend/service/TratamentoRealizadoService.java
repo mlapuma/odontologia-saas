@@ -12,7 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TratamentoRealizadoService {
@@ -26,10 +29,18 @@ public class TratamentoRealizadoService {
 		this.procedimentoRepository = procedimentoRepository;
 	}
 
+	@Transactional
 	public List<TratamentoRealizadoEntity> listar(Long tenantId, Long pacienteId) {
 		if (pacienteId != null) {
+			sincronizarSaldoAvaliacaoAtual(tenantId, pacienteId);
 			return repository.findByTenantIdAndPacienteIdOrderByDataRealizacaoDescCreatedAtDesc(tenantId, pacienteId);
 		}
+		Set<Long> pacientesComTratamentoAberto = repository.findByTenantIdOrderByDataRealizacaoDescCreatedAtDesc(tenantId)
+				.stream()
+				.filter(item -> !Boolean.TRUE.equals(item.getFinalizado()))
+				.map(TratamentoRealizadoEntity::getPacienteId)
+				.collect(Collectors.toSet());
+		pacientesComTratamentoAberto.forEach(id -> sincronizarSaldoAvaliacaoAtual(tenantId, id));
 		return repository.findByTenantIdOrderByDataRealizacaoDescCreatedAtDesc(tenantId);
 	}
 
@@ -39,7 +50,9 @@ public class TratamentoRealizadoService {
 		tratamento.setTenantId(tenantId);
 		preencherTratamento(tenantId, tratamento, dto);
 
-		return repository.save(tratamento);
+		TratamentoRealizadoEntity salvo = repository.save(tratamento);
+		sincronizarSaldoAvaliacaoAtual(tenantId, salvo.getPacienteId());
+		return salvo;
 	}
 
 	@Transactional
@@ -50,7 +63,9 @@ public class TratamentoRealizadoService {
 		}
 
 		preencherTratamento(tenantId, tratamento, dto);
-		return repository.save(tratamento);
+		TratamentoRealizadoEntity salvo = repository.save(tratamento);
+		sincronizarSaldoAvaliacaoAtual(tenantId, salvo.getPacienteId());
+		return salvo;
 	}
 
 	@Transactional
@@ -60,7 +75,9 @@ public class TratamentoRealizadoService {
 			throw new RuntimeException("Tratamento nao encontrado.");
 		}
 
+		Long pacienteId = tratamento.getPacienteId();
 		repository.delete(tratamento);
+		sincronizarSaldoAvaliacaoAtual(tenantId, pacienteId);
 	}
 
 	@Transactional
@@ -69,10 +86,27 @@ public class TratamentoRealizadoService {
 		if (!tratamento.getTenantId().equals(tenantId)) {
 			throw new RuntimeException("Tratamento nao encontrado.");
 		}
+		if (Boolean.TRUE.equals(tratamento.getFinalizado())) {
+			return tratamento;
+		}
 
-		tratamento.setFinalizado(true);
-		tratamento.setDataFinalizacao(LocalDateTime.now());
-		return repository.save(tratamento);
+		List<TratamentoRealizadoEntity> tratamentosAtivos = tratamentosAbertosDaAvaliacaoAtual(tenantId,
+				tratamento.getPacienteId(), null);
+		if (tratamentosAtivos.isEmpty()) {
+			throw new RuntimeException("Nao ha tratamento em aberto para finalizar.");
+		}
+		BigDecimal saldoAtual = calcularSaldoAvaliacao(tratamentosAtivos, BigDecimal.ZERO, BigDecimal.ZERO);
+		if (saldoAtual.compareTo(BigDecimal.ZERO) > 0) {
+			throw new RuntimeException("O tratamento so pode ser finalizado quando o saldo estiver zerado.");
+		}
+
+		LocalDateTime dataFinalizacao = LocalDateTime.now();
+		tratamentosAtivos.forEach(item -> {
+			item.setFinalizado(true);
+			item.setDataFinalizacao(dataFinalizacao);
+		});
+		repository.saveAll(tratamentosAtivos);
+		return tratamento;
 	}
 
 	private void preencherTratamento(Long tenantId, TratamentoRealizadoEntity tratamento, TratamentoRealizadoRequestDTO dto) {
@@ -90,12 +124,15 @@ public class TratamentoRealizadoService {
 		if (valorTotal.compareTo(BigDecimal.ZERO) < 0) {
 			throw new RuntimeException("Valor total deve ser informado.");
 		}
-		BigDecimal totalPagoAnterior = repository.totalPagoPacienteExcluindoTratamento(tenantId, dto.getPacienteId(),
+		List<TratamentoRealizadoEntity> tratamentosAtivos = tratamentosAbertosDaAvaliacaoAtual(tenantId, dto.getPacienteId(),
 				tratamento.getId());
-		BigDecimal totalPagoAtualizado = totalPagoAnterior.add(dto.getValorPago());
-		if (totalPagoAtualizado.compareTo(valorTotal) > 0) {
-			throw new RuntimeException("A soma dos pagamentos nao pode ser maior que o valor total da avaliacao.");
+		BigDecimal valorTotalAvaliacao = valorTotalAvaliacao(tratamentosAtivos, valorTotal);
+		BigDecimal totalPagoOutros = totalPago(tratamentosAtivos);
+		BigDecimal saldoDisponivel = valorTotalAvaliacao.subtract(totalPagoOutros);
+		if (dto.getValorPago().compareTo(saldoDisponivel) > 0) {
+			throw new RuntimeException("Valor pago nao pode ser maior que o saldo em aberto da avaliacao.");
 		}
+		BigDecimal saldoAtual = saldoDisponivel.subtract(dto.getValorPago());
 
 		tratamento.setPacienteId(dto.getPacienteId());
 		tratamento.setProcedimentoId(dto.getProcedimentoId());
@@ -103,8 +140,8 @@ public class TratamentoRealizadoService {
 		tratamento.setDente(normalizarDente(dto.getDente()));
 		tratamento.setValorPago(dto.getValorPago());
 		tratamento.setValorTratamento(valorTratamento);
-		tratamento.setValorTotal(valorTotal);
-		tratamento.setSaldo(valorTotal.subtract(totalPagoAtualizado));
+		tratamento.setValorTotal(valorTotalAvaliacao);
+		tratamento.setSaldo(saldoAtual);
 		tratamento.setFormaPagamento(normalizarTexto(dto.getFormaPagamento()));
 		tratamento.setParcelas(normalizarParcelas(dto));
 		tratamento.setDataRealizacao(dto.getDataRealizacao() == null ? LocalDate.now() : dto.getDataRealizacao());
@@ -117,6 +154,58 @@ public class TratamentoRealizadoService {
 	public List<PacienteReativacaoDTO> pacientesParaReativacao(Long tenantId, int diasSemComparecer) {
 		LocalDate limite = LocalDate.now().minusDays(diasSemComparecer);
 		return repository.buscarPacientesParaReativacao(tenantId, limite);
+	}
+
+	private List<TratamentoRealizadoEntity> tratamentosAbertosDaAvaliacaoAtual(Long tenantId, Long pacienteId,
+			Long tratamentoIdExcluido) {
+		List<TratamentoRealizadoEntity> tratamentosPaciente = repository
+				.findByTenantIdAndPacienteIdOrderByDataRealizacaoDescCreatedAtDesc(tenantId, pacienteId);
+
+		return tratamentosPaciente.stream()
+				.filter(item -> tratamentoIdExcluido == null || !item.getId().equals(tratamentoIdExcluido))
+				.filter(item -> !Boolean.TRUE.equals(item.getFinalizado()))
+				.toList();
+	}
+
+	private void sincronizarSaldoAvaliacaoAtual(Long tenantId, Long pacienteId) {
+		List<TratamentoRealizadoEntity> tratamentosAtivos = tratamentosAbertosDaAvaliacaoAtual(tenantId, pacienteId, null);
+		if (tratamentosAtivos.isEmpty()) {
+			return;
+		}
+
+		BigDecimal valorTotalAvaliacao = valorTotalAvaliacao(tratamentosAtivos, BigDecimal.ZERO);
+		BigDecimal saldoAtual = calcularSaldoAvaliacao(tratamentosAtivos, valorTotalAvaliacao, BigDecimal.ZERO);
+		tratamentosAtivos.forEach(item -> {
+			item.setValorTotal(valorTotalAvaliacao);
+			item.setSaldo(saldoAtual);
+		});
+		repository.saveAll(tratamentosAtivos);
+	}
+
+	private BigDecimal calcularSaldoAvaliacao(List<TratamentoRealizadoEntity> tratamentosAtivos,
+			BigDecimal valorTotalAvaliacao, BigDecimal valorPagoAdicional) {
+		BigDecimal totalPago = totalPago(tratamentosAtivos).add(valorPagoAdicional == null ? BigDecimal.ZERO : valorPagoAdicional);
+		BigDecimal saldo = (valorTotalAvaliacao == null ? BigDecimal.ZERO : valorTotalAvaliacao).subtract(totalPago);
+		return saldo.max(BigDecimal.ZERO);
+	}
+
+	private BigDecimal valorTotalAvaliacao(List<TratamentoRealizadoEntity> tratamentosAtivos, BigDecimal valorTotalPadrao) {
+		List<BigDecimal> valores = new ArrayList<>();
+		if (valorTotalPadrao != null) {
+			valores.add(valorTotalPadrao);
+		}
+		tratamentosAtivos.stream()
+				.map(TratamentoRealizadoEntity::getValorTotal)
+				.filter(valor -> valor != null && valor.compareTo(BigDecimal.ZERO) > 0)
+				.forEach(valores::add);
+		return valores.stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+	}
+
+	private BigDecimal totalPago(List<TratamentoRealizadoEntity> tratamentosAtivos) {
+		return tratamentosAtivos.stream()
+				.map(TratamentoRealizadoEntity::getValorPago)
+				.filter(valor -> valor != null && valor.compareTo(BigDecimal.ZERO) > 0)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	private String resolveTratamento(TratamentoRealizadoRequestDTO dto) {

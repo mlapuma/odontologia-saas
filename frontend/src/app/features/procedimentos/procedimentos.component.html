@@ -1,0 +1,97 @@
+<div class="pagina-procedimentos">
+  <div class="cabecalho">
+    <div>
+      <h1>Procedimentos</h1>
+      <p>Atualize os valores base usados na selecao de tratamentos e agendamentos.</p>
+    </div>
+    <button class="btn-novo" type="button" (click)="novoProcedimento()">+ Novo procedimento</button>
+  </div>
+
+  <div class="mensagens">
+    <p class="sucesso" *ngIf="mensagem">{{ mensagem }}</p>
+    <p class="erro" *ngIf="erro">{{ erro }}</p>
+  </div>
+
+  <section class="card">
+    <div class="formulario" *ngIf="formularioAberto">
+      <h2>{{ editandoId ? 'Editar procedimento' : 'Novo procedimento' }}</h2>
+      <div class="campos-form">
+        <label>
+          Procedimento
+          <input [(ngModel)]="form.nome" placeholder="Nome do procedimento" />
+        </label>
+        <label>
+          Valor
+          <input type="number" min="0" step="0.01" [(ngModel)]="form.valorBase" />
+        </label>
+        <label>
+          Categoria
+          <input [(ngModel)]="form.categoria" placeholder="Odontologia" />
+        </label>
+      </div>
+      <div class="form-acoes">
+        <button class="btn-salvar" type="button" (click)="salvarProcedimento()" [disabled]="salvandoId === (editandoId || 0)">
+          {{ salvandoId === (editandoId || 0) ? 'Salvando...' : 'Salvar procedimento' }}
+        </button>
+        <button class="btn-cancelar" type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="card-topo">
+      <div>
+        <h2>Valores dos procedimentos</h2>
+        <p>Altere o valor a qualquer momento. A proxima selecao na tela de tratamentos ja usara o novo valor.</p>
+      </div>
+      <label>
+        Buscar procedimento
+        <input type="search" [(ngModel)]="filtro" placeholder="Digite o nome do procedimento" />
+      </label>
+    </div>
+
+    <p *ngIf="carregando">Carregando...</p>
+
+    <div class="tabela-scroll" *ngIf="!carregando">
+      <table>
+        <thead>
+          <tr>
+            <th>Procedimento</th>
+            <th>Categoria</th>
+            <th>Valor</th>
+            <th>Acoes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let procedimento of procedimentosFiltrados">
+            <td>
+              <strong>{{ procedimento.nome }}</strong>
+            </td>
+            <td>{{ procedimento.categoria || '-' }}</td>
+            <td>
+              <input
+                class="valor-input"
+                type="number"
+                min="0"
+                step="0.01"
+                [(ngModel)]="valores[procedimento.id]"
+              />
+            </td>
+            <td>
+              <button class="btn-editar" type="button" (click)="editarProcedimento(procedimento)">Editar</button>
+              <button
+                class="btn-salvar"
+                type="button"
+                (click)="salvarValor(procedimento)"
+                [disabled]="salvandoId === procedimento.id"
+              >
+                {{ salvandoId === procedimento.id ? 'Salvando...' : 'Salvar valor' }}
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="procedimentosFiltrados.length === 0">
+            <td colspan="4">Nenhum procedimento encontrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

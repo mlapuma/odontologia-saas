@@ -1,0 +1,186 @@
+.cabecalho {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.cabecalho h1,
+.card-topo h2 {
+  margin: 0 0 8px;
+}
+
+.cabecalho p,
+.card-topo p {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.mensagens {
+  margin-bottom: 16px;
+}
+
+.sucesso,
+.erro {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+}
+
+.sucesso {
+  color: var(--color-success);
+  background: #e8f7ed;
+}
+
+.erro {
+  color: var(--color-danger);
+  background: #fff2ee;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.formulario {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #fffaf0;
+}
+
+.formulario h2 {
+  margin: 0 0 14px;
+}
+
+.campos-form {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+}
+
+.campos-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #4f402b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.form-acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.card-topo {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.card-topo label {
+  display: flex;
+  width: min(420px, 100%);
+  flex-direction: column;
+  gap: 6px;
+  color: #4f402b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+input {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+}
+
+.tabela-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+th {
+  color: #4b2f05;
+  background: #fff8e8;
+}
+
+.valor-input {
+  width: 150px;
+}
+
+button {
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.btn-salvar {
+  color: #1c1204;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-strong));
+  font-weight: 700;
+}
+
+.btn-novo,
+.btn-editar {
+  color: #5d3f08;
+  background: var(--color-gold-soft);
+  font-weight: 700;
+}
+
+.btn-cancelar {
+  color: var(--color-danger);
+  background: #fff2ee;
+  font-weight: 700;
+}
+
+.btn-editar {
+  margin-right: 8px;
+}
+
+@media (max-width: 640px) {
+  .card-topo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .cabecalho,
+  .campos-form,
+  .form-acoes {
+    flex-direction: column;
+  }
+
+  .campos-form {
+    display: flex;
+  }
+}

@@ -1,4 +1,4 @@
-<div class="pagina-financeiro">
+﻿<div class="pagina-financeiro">
   <div class="cabecalho">
     <div>
       <h1>Financeiro</h1>
@@ -27,6 +27,15 @@
         <span>Pendências</span>
         <strong>{{ resumo.quantidadePendencias }}</strong>
       </div>
+    </div>
+
+    <div class="financeiro-acoes">
+      <button type="button" [class.ativo]="exibirRecebidoPorAno" (click)="alternarRecebidoPorAno()">
+        {{ exibirRecebidoPorAno ? 'Ocultar recebido por ano' : 'Exibir recebido por ano' }}
+      </button>
+      <button type="button" [class.ativo]="exibirHistoricoFinanceiro" (click)="alternarHistoricoFinanceiro()">
+        {{ exibirHistoricoFinanceiro ? 'Ocultar histórico financeiro' : 'Exibir histórico financeiro' }}
+      </button>
     </div>
 
     <section class="card financeiro-lista">
@@ -58,35 +67,100 @@
       </div>
     </section>
 
-    <section class="card financeiro-lista">
-      <h2>Histórico financeiro</h2>
-      <div class="tabela-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Paciente</th>
-              <th>Valor total</th>
-              <th>Valor pago</th>
-              <th>Forma</th>
-              <th>Status</th>
-              <th>Data pagamento</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let pagamento of pagamentos">
-              <td>{{ nomePaciente(pagamento.pacienteId) }}</td>
-              <td>{{ pagamento.valorTotal | currency:'BRL' }}</td>
-              <td>{{ pagamento.valorPago | currency:'BRL' }}</td>
-              <td>{{ pagamento.formaPagamento || '-' }}</td>
-              <td>{{ pagamento.status }}</td>
-              <td>{{ pagamento.dataPagamento | date:'dd/MM/yyyy HH:mm' }}</td>
-            </tr>
-            <tr *ngIf="pagamentos.length === 0">
-              <td colspan="6">Nenhum pagamento registrado.</td>
-            </tr>
-          </tbody>
-        </table>
+    <section class="card financeiro-lista" *ngIf="exibirRecebidoPorAno">
+      <h2>Recebido por ano</h2>
+
+      <div class="recebimentos-accordion" *ngIf="recebimentosPorAno.length > 0; else semRecebimentosMensais">
+        <article class="ano-card" *ngFor="let ano of recebimentosPorAno">
+          <button class="ano-resumo" type="button" (click)="alternarAno(ano.ano)">
+            <span class="ano-titulo">
+              <span class="ano-icone">{{ anoAberto(ano.ano) ? '-' : '+' }}</span>
+              <strong>{{ ano.ano }}</strong>
+            </span>
+            <span>{{ ano.totalRecebido | currency:'BRL' }}</span>
+            <span>{{ ano.quantidade }} pagamento(s)</span>
+          </button>
+
+          <div class="meses-lista" *ngIf="anoAberto(ano.ano)">
+            <div class="mes-linha cabecalho-meses">
+              <span>Mês</span>
+              <span>Total recebido</span>
+              <span>Pagamentos</span>
+            </div>
+            <div class="mes-linha" *ngFor="let mes of ano.meses">
+              <span>{{ mes.mes | titlecase }}</span>
+              <strong>{{ mes.totalRecebido | currency:'BRL' }}</strong>
+              <span>{{ mes.quantidade }}</span>
+            </div>
+          </div>
+        </article>
       </div>
+
+      <ng-template #semRecebimentosMensais>
+        <p class="vazio">Nenhum recebimento mensal registrado.</p>
+      </ng-template>
+    </section>
+
+    <section class="card financeiro-lista" *ngIf="exibirHistoricoFinanceiro">
+      <h2>Histórico financeiro</h2>
+
+      <div class="historico-accordion" *ngIf="historicoPorAno.length > 0; else semHistoricoFinanceiro">
+        <article class="ano-card" *ngFor="let ano of historicoPorAno">
+          <button class="ano-resumo" type="button" (click)="alternarAnoHistorico(ano.ano)">
+            <span class="ano-titulo">
+              <span class="ano-icone">{{ anoHistoricoAberto(ano.ano) ? '-' : '+' }}</span>
+              <strong>{{ ano.ano }}</strong>
+            </span>
+            <span>{{ ano.totalRecebido | currency:'BRL' }}</span>
+            <span>{{ ano.quantidade }} lançamento(s)</span>
+          </button>
+
+          <div class="historico-conteudo" *ngIf="anoHistoricoAberto(ano.ano)">
+            <div class="tabela-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Paciente</th>
+                    <th>Origem</th>
+                    <th>Descrição</th>
+                    <th>Valor total</th>
+                    <th>Valor pago</th>
+                    <th>Forma de pagamento</th>
+                    <th>Status</th>
+                    <th>Data pagamento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let lancamento of historicoPaginado(ano)">
+                    <td>{{ nomePaciente(lancamento.pacienteId) }}</td>
+                    <td>{{ lancamento.origem }}</td>
+                    <td>{{ lancamento.descricao }}</td>
+                    <td>{{ lancamento.valorTotal | currency:'BRL' }}</td>
+                    <td>{{ lancamento.valorPago | currency:'BRL' }}</td>
+                    <td>{{ labelFormaPagamento(lancamento.formaPagamento) }}</td>
+                    <td>{{ lancamento.status }}</td>
+                    <td>{{ lancamento.dataPagamento | date:'dd/MM/yyyy HH:mm' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="paginacao" *ngIf="totalPaginasHistorico(ano) > 1">
+              <button type="button" (click)="alterarPaginaHistorico(ano, -1)" [disabled]="paginaHistorico(ano.ano) === 1">
+                Anterior
+              </button>
+              <span>Página {{ paginaHistorico(ano.ano) }} de {{ totalPaginasHistorico(ano) }}</span>
+              <button type="button" (click)="alterarPaginaHistorico(ano, 1)" [disabled]="paginaHistorico(ano.ano) === totalPaginasHistorico(ano)">
+                Próxima
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #semHistoricoFinanceiro>
+        <p class="vazio">Nenhum pagamento registrado.</p>
+      </ng-template>
     </section>
   </ng-container>
 </div>

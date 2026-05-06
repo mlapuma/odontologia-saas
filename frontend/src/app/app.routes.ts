@@ -13,6 +13,7 @@ import { GooglePerformanceComponent } from './features/google-performance/google
 import { ReativacaoComponent } from './features/reativacao/reativacao.component';
 import { ProximosAgendamentosComponent } from './features/proximos-agendamentos/proximos-agendamentos.component';
 import { ProfissionaisComponent } from './features/profissionais/profissionais.component';
+import { ProcedimentosComponent } from './features/procedimentos/procedimentos.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -26,6 +27,7 @@ export const routes: Routes = [
       { path: 'importar-ficha', component: ImportarFichaComponent },
       { path: 'agenda', component: AgendaComponent },
       { path: 'tratamentos', component: TratamentosComponent },
+      { path: 'procedimentos', component: ProcedimentosComponent },
       { path: 'financeiro', component: FinanceiroComponent },
       { path: 'integracoes', component: IntegracoesComponent },
       { path: 'google', component: GooglePerformanceComponent },

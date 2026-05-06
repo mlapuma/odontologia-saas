@@ -16,4 +16,15 @@ export class ProcedimentoService {
   listar(): Observable<Procedimento[]> {
     return this.http.get<Procedimento[]>(this.api);
   }
+
+  atualizarValor(id: number, valorBase: number): Observable<Procedimento> {
+    return this.http.put<Procedimento>(`${this.api}/${id}/valor`, { valorBase });
+  }
+
+  salvar(procedimento: Partial<Procedimento>): Observable<Procedimento> {
+    if (procedimento.id) {
+      return this.http.put<Procedimento>(`${this.api}/${procedimento.id}`, procedimento);
+    }
+    return this.http.post<Procedimento>(this.api, procedimento);
+  }
 }

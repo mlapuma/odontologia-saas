@@ -3,3 +3,7 @@ scanner-tests/
 .env
 .env.*
 !.env.example
+*.dump
+odonto-local-*.sql
+check-counts.sql
+usuarios-query.sql

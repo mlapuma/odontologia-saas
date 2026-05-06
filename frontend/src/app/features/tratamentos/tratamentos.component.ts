@@ -21,45 +21,6 @@ export class TratamentosComponent implements OnInit {
   pacientes: Paciente[] = [];
   procedimentos: Procedimento[] = [];
   tratamentos: TratamentoRealizado[] = [];
-  tratamentosOdontologicos = [
-    'Avaliação odontológica',
-    'Profilaxia / limpeza',
-    'Aplicação de flúor',
-    'Raspagem periodontal',
-    'Tratamento periodontal',
-    'Clareamento dental',
-    'Restauração em resina',
-    'Restauração em amálgama',
-    'Remocao de carie + curativo',
-    'Exo',
-    'Medicacao',
-    'Tratamento de canal',
-    'Retratamento de canal',
-    'Extração dentária',
-    'Extração de siso',
-    'Cirurgia oral menor',
-    'Implante dentário',
-    'Protocolo sobre implantes',
-    'Próteses fixas',
-    'Prótese removível',
-    'Prótese total',
-    'Coroa dentária',
-    'Lente de contato dental',
-    'Faceta em resina',
-    'Faceta em porcelana',
-    'Aparelho ortodôntico',
-    'Manutenção ortodôntica',
-    'Alinhadores transparentes',
-    'Tratamento de bruxismo',
-    'Placa miorrelaxante',
-    'Odontopediatria',
-    'Selante dental',
-    'Radiografia odontológica',
-    'Enxerto ósseo',
-    'Gengivoplastia',
-    'Frenectomia',
-    'Urgência odontológica'
-  ];
   dentesArcada = [
     { grupo: 'Superior direito', dentes: ['18', '17', '16', '15', '14', '13', '12', '11'] },
     { grupo: 'Superior esquerdo', dentes: ['21', '22', '23', '24', '25', '26', '27', '28'] },
@@ -84,6 +45,8 @@ export class TratamentosComponent implements OnInit {
   formularioAberto = false;
   historicoAberto = false;
   filtroPaciente = '';
+  pacienteHistoricoId: number | null = null;
+  tratamentoSelecionadoId?: number;
 
   constructor(
     private pacienteService: PacienteService,
@@ -96,6 +59,7 @@ export class TratamentosComponent implements OnInit {
     const pacienteId = Number(this.route.snapshot.queryParamMap.get('pacienteId'));
     if (pacienteId) {
       this.pacienteIdFiltro = pacienteId;
+      this.pacienteHistoricoId = pacienteId;
       this.form.pacienteId = pacienteId;
     }
 
@@ -130,12 +94,9 @@ export class TratamentosComponent implements OnInit {
       this.erro = 'Informe o valor total da avaliacao.';
       return;
     }
-    if (this.valorProcedimentosPacienteFormulario > Number(this.form.valorTotal)) {
-      this.erro = 'A soma dos procedimentos nao pode ser maior que o valor total da avaliacao.';
-      return;
-    }
-    if (this.valorPagoPacienteFormulario > Number(this.form.valorTotal)) {
-      this.erro = 'A soma dos pagamentos nao pode ser maior que o valor total da avaliacao.';
+    const saldoAberto = this.saldoAbertoAvaliacaoFormulario();
+    if (saldoAberto !== null && Number(this.form.valorPago) > saldoAberto) {
+      this.erro = 'Valor pago nao pode ser maior que o saldo em aberto da avaliacao.';
       return;
     }
     if (Number(this.form.valorPago) > 0 && !this.form.formaPagamento) {
@@ -175,7 +136,7 @@ export class TratamentosComponent implements OnInit {
       },
       error: (err) => {
         this.salvando = false;
-        this.erro = err?.error?.message || 'Erro ao registrar tratamento.';
+        this.erro = this.mensagemErro(err, 'Erro ao registrar tratamento.');
       }
     });
   }
@@ -227,33 +188,38 @@ export class TratamentosComponent implements OnInit {
         this.carregarTratamentos();
       },
       error: (err) => {
-        this.erro = err?.error?.message || 'Erro ao excluir tratamento.';
+        this.erro = this.mensagemErro(err, 'Erro ao excluir tratamento.');
       }
     });
   }
 
-  finalizarTratamento(tratamento: TratamentoRealizado): void {
-    if (!tratamento.id || tratamento.finalizado) {
+  finalizarTratamento(): void {
+    const tratamentoBase = this.tratamentoSelecionado;
+    if (!tratamentoBase?.id || tratamentoBase.finalizado) {
+      return;
+    }
+    if (!this.podeFinalizarTratamento) {
+      this.erro = 'O tratamento so pode ser finalizado quando o saldo estiver zerado.';
       return;
     }
 
-    const confirmou = confirm(`Finalizar o tratamento "${tratamento.tratamento}" e liberar uma nova avaliacao para este paciente?`);
+    const confirmou = confirm(`Finalizar o tratamento de ${this.nomePaciente(tratamentoBase.pacienteId)} e liberar uma nova avaliacao para este paciente?`);
     if (!confirmou) {
       return;
     }
 
     this.mensagem = '';
     this.erro = '';
-    this.tratamentoService.finalizar(tratamento.id).subscribe({
+    this.tratamentoService.finalizar(tratamentoBase.id).subscribe({
       next: () => {
         this.mensagem = 'Tratamento finalizado com sucesso. Uma nova avaliacao podera ser iniciada para o paciente.';
-        if (this.editandoId === tratamento.id) {
+        if (this.editandoId === tratamentoBase.id) {
           this.cancelarEdicao();
         }
         this.carregarTratamentos();
       },
       error: (err) => {
-        this.erro = err?.error?.message || 'Erro ao finalizar tratamento.';
+        this.erro = this.mensagemErro(err, 'Erro ao finalizar tratamento.');
       }
     });
   }
@@ -287,15 +253,80 @@ export class TratamentosComponent implements OnInit {
     return this.pacientes.find(paciente => paciente.id === id)?.nome || 'Paciente';
   }
 
+  labelFormaPagamento(valor?: string | null): string {
+    if (!valor) {
+      return '-';
+    }
+    return this.formasPagamento.find(forma => forma.valor === valor)?.label || valor;
+  }
+
   get tratamentosFiltrados(): TratamentoRealizado[] {
-    const termo = this.filtroPaciente.trim().toLowerCase();
-    if (!termo) {
-      return this.tratamentos;
+    if (!this.possuiFiltroPaciente) {
+      return [];
     }
 
-    return this.tratamentos.filter(tratamento =>
-      this.nomePaciente(tratamento.pacienteId).toLowerCase().includes(termo)
-    );
+    return this.tratamentosAtivosPaciente.length > 0
+      ? this.tratamentosAtivosPaciente
+      : this.tratamentosFinalizadosPaciente;
+  }
+
+  get possuiFiltroPaciente(): boolean {
+    return Boolean(this.pacienteHistoricoId);
+  }
+
+  get tratamentosPacienteSelecionado(): TratamentoRealizado[] {
+    if (!this.pacienteHistoricoId) {
+      return [];
+    }
+
+    return this.tratamentos.filter(tratamento => tratamento.pacienteId === Number(this.pacienteHistoricoId));
+  }
+
+  get tratamentosAtivosPaciente(): TratamentoRealizado[] {
+    return this.tratamentosPacienteSelecionado.filter(tratamento => !tratamento.finalizado);
+  }
+
+  get tratamentosFinalizadosPaciente(): TratamentoRealizado[] {
+    const finalizados = this.tratamentosPacienteSelecionado.filter(tratamento => tratamento.finalizado);
+    const ultimaFinalizacao = finalizados
+      .map(tratamento => this.chaveFinalizacao(tratamento))
+      .sort()
+      .pop();
+
+    if (!ultimaFinalizacao) {
+      return [];
+    }
+
+    return finalizados.filter(tratamento => this.chaveFinalizacao(tratamento) === ultimaFinalizacao);
+  }
+
+  get possuiTratamentoAtivo(): boolean {
+    return this.tratamentosAtivosPaciente.length > 0;
+  }
+
+  get tratamentoSelecionado(): TratamentoRealizado | undefined {
+    if (this.tratamentoSelecionadoId) {
+      return this.tratamentosFiltrados.find(tratamento => tratamento.id === this.tratamentoSelecionadoId)
+        || this.tratamentosFiltrados[0];
+    }
+    return this.tratamentosFiltrados[0];
+  }
+
+  get podeFinalizarTratamento(): boolean {
+    return Boolean(this.possuiTratamentoAtivo && this.tratamentoSelecionado && !this.tratamentoSelecionado.finalizado && this.valorRestanteTratamentos <= 0);
+  }
+
+  selecionarTratamento(tratamento: TratamentoRealizado): void {
+    this.tratamentoSelecionadoId = tratamento.id;
+    this.mensagem = '';
+    this.erro = '';
+  }
+
+  aoSelecionarPacienteHistorico(): void {
+    this.tratamentoSelecionadoId = undefined;
+    this.filtroPaciente = '';
+    this.mensagem = '';
+    this.erro = '';
   }
 
   get tratamentoDescricao(): string {
@@ -307,7 +338,7 @@ export class TratamentosComponent implements OnInit {
 
   get tratamentosParaSelecao(): string[] {
     const nomesProcedimentos = this.procedimentos.map(item => item.nome);
-    return Array.from(new Set([...this.tratamentosOdontologicos, ...nomesProcedimentos]))
+    return Array.from(new Set(nomesProcedimentos))
       .sort((a, b) => a.localeCompare(b));
   }
 
@@ -358,17 +389,6 @@ export class TratamentosComponent implements OnInit {
       return;
     }
 
-    const procedimentoPadrao = this.tratamentosOdontologicos.find(item =>
-      this.normalizarTermo(item) === termo
-    );
-
-    if (procedimentoPadrao) {
-      this.form.procedimentoId = null;
-      this.form.procedimentoSelecao = `padrao-${procedimentoPadrao}`;
-      this.form.tratamento = procedimentoPadrao;
-      return;
-    }
-
     this.form.procedimentoId = null;
   }
 
@@ -401,9 +421,8 @@ export class TratamentosComponent implements OnInit {
       return Number(this.form.valorTratamento || 0);
     }
 
-    const totalRegistrado = this.tratamentos
-      .filter(tratamento => tratamento.pacienteId === Number(this.form.pacienteId) && tratamento.id !== this.editandoId)
-      .filter(tratamento => !tratamento.finalizado)
+    const totalRegistrado = this.tratamentosAbertosDaAvaliacaoAtual(this.form.pacienteId)
+      .filter(tratamento => tratamento.id !== this.editandoId)
       .reduce((total, tratamento) => total + Number(tratamento.valorTratamento || tratamento.valorTotal || tratamento.valorPago || 0), 0);
 
     return totalRegistrado + Number(this.form.valorTratamento || 0);
@@ -414,15 +433,18 @@ export class TratamentosComponent implements OnInit {
       return Number(this.form.valorPago || 0);
     }
 
-    const totalPagoRegistrado = this.tratamentos
-      .filter(tratamento => tratamento.pacienteId === Number(this.form.pacienteId) && tratamento.id !== this.editandoId)
-      .filter(tratamento => !tratamento.finalizado)
+    const totalPagoRegistrado = this.tratamentosAbertosDaAvaliacaoAtual(this.form.pacienteId)
+      .filter(tratamento => tratamento.id !== this.editandoId)
       .reduce((total, tratamento) => total + Number(tratamento.valorPago || 0), 0);
 
     return totalPagoRegistrado + Number(this.form.valorPago || 0);
   }
 
   get valorRestanteAvaliacaoFormulario(): number {
+    const saldoAberto = this.saldoAbertoAvaliacaoFormulario();
+    if (saldoAberto !== null) {
+      return Math.max(saldoAberto - Number(this.form.valorPago || 0), 0);
+    }
     return Math.max(Number(this.form.valorTotal || 0) - this.valorPagoPacienteFormulario, 0);
   }
 
@@ -443,6 +465,9 @@ export class TratamentosComponent implements OnInit {
   }
 
   get valorRestanteTratamentos(): number {
+    if (this.possuiTratamentoAtivo) {
+      return this.saldoCalculadoTratamentos(this.tratamentosAtivosPaciente);
+    }
     return Math.max(this.valorTotalAvaliacaoTratamentos - this.valorPagoTratamentos, 0);
   }
 
@@ -458,6 +483,7 @@ export class TratamentosComponent implements OnInit {
         this.procedimentos = procedimentos.filter(item => item.ativo !== false);
         this.tratamentos = tratamentos;
         this.aplicarAvaliacaoExistenteDoPaciente();
+        this.ajustarTratamentoSelecionado();
         this.carregando = false;
       },
       error: () => {
@@ -469,8 +495,21 @@ export class TratamentosComponent implements OnInit {
 
   private carregarTratamentos(): void {
     this.tratamentoService.listar(this.pacienteIdFiltro).subscribe({
-      next: (response) => this.tratamentos = response
+      next: (response) => {
+        this.tratamentos = response;
+        this.ajustarTratamentoSelecionado();
+      }
     });
+  }
+
+  private ajustarTratamentoSelecionado(): void {
+    if (!this.tratamentoSelecionadoId) {
+      return;
+    }
+    const selecionadoExiste = this.tratamentosFiltrados.some(tratamento => tratamento.id === this.tratamentoSelecionadoId);
+    if (!selecionadoExiste) {
+      this.tratamentoSelecionadoId = undefined;
+    }
   }
 
   private novoForm() {
@@ -493,9 +532,7 @@ export class TratamentosComponent implements OnInit {
 
   private aplicarAvaliacaoExistenteDoPaciente(): void {
     const valorTotalAvaliacao = this.valorTotalAvaliacaoPaciente(this.form.pacienteId);
-    if (valorTotalAvaliacao > 0) {
-      this.form.valorTotal = valorTotalAvaliacao;
-    }
+    this.form.valorTotal = valorTotalAvaliacao;
   }
 
   private valorTotalAvaliacaoPaciente(pacienteId?: number | null): number {
@@ -503,10 +540,62 @@ export class TratamentosComponent implements OnInit {
       return 0;
     }
 
-    return this.tratamentos
-      .filter(tratamento => tratamento.pacienteId === Number(pacienteId) && tratamento.id !== this.editandoId)
-      .filter(tratamento => !tratamento.finalizado)
+    return this.tratamentosAbertosDaAvaliacaoAtual(pacienteId)
+      .filter(tratamento => tratamento.id !== this.editandoId)
       .reduce((maior, tratamento) => Math.max(maior, Number(tratamento.valorTotal || 0)), 0);
+  }
+
+  private tratamentosAbertosDaAvaliacaoAtual(pacienteId?: number | null): TratamentoRealizado[] {
+    if (!pacienteId) {
+      return [];
+    }
+
+    const tratamentosPaciente = this.tratamentos.filter(tratamento => tratamento.pacienteId === Number(pacienteId));
+    return tratamentosPaciente
+      .filter(tratamento => !tratamento.finalizado);
+  }
+
+  private chaveFinalizacao(tratamento: TratamentoRealizado): string {
+    return tratamento.dataFinalizacao || tratamento.dataRealizacao || '';
+  }
+
+  private saldoAbertoAvaliacaoFormulario(): number | null {
+    if (!this.form.pacienteId) {
+      return null;
+    }
+
+    const tratamentosAbertos = this.tratamentosAbertosDaAvaliacaoAtual(this.form.pacienteId)
+      .filter(tratamento => tratamento.id !== this.editandoId);
+
+    const valorTotalAvaliacao = tratamentosAbertos.reduce(
+      (maior, tratamento) => Math.max(maior, Number(tratamento.valorTotal || 0)),
+      Number(this.form.valorTotal || 0)
+    );
+
+    if (valorTotalAvaliacao <= 0 && tratamentosAbertos.length === 0) {
+      return null;
+    }
+
+    const totalPagoOutros = tratamentosAbertos
+      .reduce((total, tratamento) => total + Number(tratamento.valorPago || 0), 0);
+
+    return Math.max(valorTotalAvaliacao - totalPagoOutros, 0);
+  }
+
+  private saldoCalculadoTratamentos(tratamentos: TratamentoRealizado[]): number {
+    const valorTotalAvaliacao = tratamentos.reduce(
+      (maior, tratamento) => Math.max(maior, Number(tratamento.valorTotal || 0)),
+      0
+    );
+    const totalPago = tratamentos.reduce((total, tratamento) => total + Number(tratamento.valorPago || 0), 0);
+    return Math.max(valorTotalAvaliacao - totalPago, 0);
+  }
+
+  private mensagemErro(err: any, padrao: string): string {
+    if (typeof err?.error === 'string' && err.error.trim()) {
+      return err.error;
+    }
+    return err?.error?.message || padrao;
   }
 
   private hoje(): string {

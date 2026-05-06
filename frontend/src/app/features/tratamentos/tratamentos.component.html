@@ -152,7 +152,10 @@
         <h2>Hist&oacute;rico registrado</h2>
         <label>
           Filtrar paciente
-          <input type="search" [(ngModel)]="filtroPaciente" placeholder="Buscar pelo nome do paciente" />
+          <select [(ngModel)]="pacienteHistoricoId" (ngModelChange)="aoSelecionarPacienteHistorico()">
+            <option [ngValue]="null">Selecione o paciente</option>
+            <option *ngFor="let paciente of pacientes" [ngValue]="paciente.id">{{ paciente.nome }}</option>
+          </select>
         </label>
       </div>
 
@@ -175,7 +178,11 @@
         </div>
       </div>
 
-      <div class="tabela-scroll">
+      <p class="aviso-filtro" *ngIf="!possuiFiltroPaciente">
+        Selecione um paciente para exibir os procedimentos do tratamento em aberto.
+      </p>
+
+      <div class="tabela-scroll" *ngIf="possuiFiltroPaciente">
         <table>
           <colgroup>
             <col class="col-data" />
@@ -201,14 +208,19 @@
               <th>Valor trat.</th>
               <th>Valor pago</th>
               <th>Restante</th>
-              <th>Forma</th>
+              <th>Pagamento</th>
               <th>Status</th>
               <th>Observa&ccedil;&otilde;es</th>
               <th>A&ccedil;&otilde;es</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let tratamento of tratamentosFiltrados">
+            <tr
+              *ngFor="let tratamento of tratamentosFiltrados"
+              class="linha-tratamento"
+              [class.selecionado]="tratamentoSelecionado?.id === tratamento.id"
+              (click)="selecionarTratamento(tratamento)"
+            >
               <td>{{ tratamento.dataRealizacao | date:'dd/MM/yyyy' }}</td>
               <td>{{ nomePaciente(tratamento.pacienteId) }}</td>
               <td>{{ tratamento.tratamento }}</td>
@@ -218,7 +230,7 @@
               <td>{{ tratamento.valorPago | currency:'BRL' }}</td>
               <td>{{ tratamento.saldo | currency:'BRL' }}</td>
               <td>
-                {{ tratamento.formaPagamento || '-' }}
+                {{ labelFormaPagamento(tratamento.formaPagamento) }}
                 <span *ngIf="tratamento.parcelas">({{ tratamento.parcelas }}x)</span>
               </td>
               <td>
@@ -226,27 +238,43 @@
                 <span class="status-aberto" *ngIf="!tratamento.finalizado">Aberto</span>
               </td>
               <td>{{ tratamento.observacoes }}</td>
-              <td class="acoes">
-                <ng-container *ngIf="!tratamento.finalizado; else tratamentoBloqueado">
-                  <button class="btn-editar" type="button" (click)="editarTratamento(tratamento)">Editar</button>
-                  <button class="btn-finalizar" type="button" (click)="finalizarTratamento(tratamento)">
-                    Finalizar
-                  </button>
-                  <button class="btn-excluir" type="button" (click)="excluirTratamento(tratamento)">Excluir</button>
-                </ng-container>
-                <ng-template #tratamentoBloqueado>
-                  <button class="btn-bloqueado" type="button" disabled title="Tratamento finalizado">
-                    <span aria-hidden="true">&#128274;</span>
-                    Finalizado
-                  </button>
-                </ng-template>
+              <td class="acoes acoes-linha">
+                <button class="btn-editar" type="button" (click)="editarTratamento(tratamento); $event.stopPropagation()">Editar</button>
+                <button class="btn-excluir" type="button" (click)="excluirTratamento(tratamento); $event.stopPropagation()">Excluir</button>
               </td>
             </tr>
             <tr *ngIf="tratamentosFiltrados.length === 0">
-              <td colspan="12">Nenhum tratamento registrado ainda.</td>
+              <td colspan="12">Nenhum tratamento registrado para este paciente.</td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="acoes-rodape" *ngIf="possuiFiltroPaciente && tratamentoSelecionado && possuiTratamentoAtivo">
+        <small *ngIf="!podeFinalizarTratamento">
+          Para finalizar, o saldo da avaliacao precisa estar zerado.
+        </small>
+        <div class="acoes">
+          <button
+            class="btn-finalizar"
+            type="button"
+            (click)="finalizarTratamento()"
+            [disabled]="!podeFinalizarTratamento"
+            [title]="podeFinalizarTratamento ? 'Finalizar tratamento completo' : 'Zere o saldo para finalizar'"
+          >
+            Finalizar tratamento
+          </button>
+        </div>
+      </div>
+
+      <div class="acoes-rodape finalizado-geral" *ngIf="possuiFiltroPaciente && tratamentoSelecionado && !possuiTratamentoAtivo">
+        <small>
+          Este tratamento ja foi finalizado. Para iniciar outro ciclo, cadastre um novo tratamento.
+        </small>
+        <button class="btn-bloqueado" type="button" disabled title="Tratamento finalizado">
+          <span aria-hidden="true">[x]</span>
+          Finalizado
+        </button>
       </div>
     </section>
   </div>
