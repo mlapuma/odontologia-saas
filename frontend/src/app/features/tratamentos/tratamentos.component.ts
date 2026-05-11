@@ -227,8 +227,9 @@ export class TratamentosComponent implements OnInit {
   cancelarEdicao(): void {
     this.editandoId = undefined;
     this.form = this.novoForm();
-    if (this.pacienteIdFiltro) {
-      this.form.pacienteId = this.pacienteIdFiltro;
+    const pacienteIdAtual = this.pacienteAtualId();
+    if (pacienteIdAtual) {
+      this.form.pacienteId = pacienteIdAtual;
     }
     this.formularioAberto = false;
   }
@@ -238,8 +239,9 @@ export class TratamentosComponent implements OnInit {
     this.erro = '';
     this.editandoId = undefined;
     this.form = this.novoForm();
-    if (this.pacienteIdFiltro) {
-      this.form.pacienteId = this.pacienteIdFiltro;
+    const pacienteIdAtual = this.pacienteAtualId();
+    if (pacienteIdAtual) {
+      this.form.pacienteId = pacienteIdAtual;
       this.aplicarAvaliacaoExistenteDoPaciente();
     }
     this.formularioAberto = true;
@@ -327,6 +329,10 @@ export class TratamentosComponent implements OnInit {
     this.filtroPaciente = '';
     this.mensagem = '';
     this.erro = '';
+    if (!this.editandoId) {
+      this.form.pacienteId = this.pacienteHistoricoId;
+      this.aplicarAvaliacaoExistenteDoPaciente();
+    }
   }
 
   get tratamentoDescricao(): string {
@@ -510,6 +516,13 @@ export class TratamentosComponent implements OnInit {
     if (!selecionadoExiste) {
       this.tratamentoSelecionadoId = undefined;
     }
+  }
+
+  private pacienteAtualId(): number | null {
+    return this.pacienteIdFiltro
+      || this.pacienteHistoricoId
+      || this.tratamentoSelecionado?.pacienteId
+      || null;
   }
 
   private novoForm() {
