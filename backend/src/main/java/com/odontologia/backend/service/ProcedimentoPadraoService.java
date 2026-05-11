@@ -84,7 +84,7 @@ public class ProcedimentoPadraoService {
 				: repository.findById(request.id()).orElseThrow();
 
 		if (procedimento.getId() == null) {
-			if (repository.findByTenantIdAndNomeIgnoreCase(tenantId, nome).isPresent()) {
+			if (!repository.findByTenantIdAndNomeIgnoreCaseOrderByAtivoDescIdAsc(tenantId, nome).isEmpty()) {
 				throw new RuntimeException("Ja existe um procedimento com este nome.");
 			}
 			procedimento.setTenantId(tenantId);
@@ -123,7 +123,7 @@ public class ProcedimentoPadraoService {
 
 	private void garantirPadroes(Long tenantId) {
 		for (String nome : PROCEDIMENTOS_ODONTOLOGICOS) {
-			if (repository.findByTenantIdAndNomeIgnoreCase(tenantId, nome).isPresent()) {
+			if (!repository.findByTenantIdAndNomeIgnoreCaseOrderByAtivoDescIdAsc(tenantId, nome).isEmpty()) {
 				continue;
 			}
 
