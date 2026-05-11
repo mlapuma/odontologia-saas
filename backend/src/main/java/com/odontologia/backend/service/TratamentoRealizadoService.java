@@ -120,7 +120,9 @@ public class TratamentoRealizadoService {
 		if (valorTratamento.compareTo(BigDecimal.ZERO) < 0) {
 			throw new RuntimeException("Valor do tratamento deve ser informado.");
 		}
-		BigDecimal valorTotal = dto.getValorTotal() == null ? valorTratamento : dto.getValorTotal();
+		BigDecimal valorTotal = dto.getValorTotal() == null || dto.getValorTotal().compareTo(BigDecimal.ZERO) <= 0
+				? valorTratamento
+				: dto.getValorTotal();
 		if (valorTotal.compareTo(BigDecimal.ZERO) < 0) {
 			throw new RuntimeException("Valor total deve ser informado.");
 		}

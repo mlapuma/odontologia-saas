@@ -362,6 +362,7 @@ export class TratamentosComponent implements OnInit {
       this.form.procedimentoId = procedimentoId;
       this.form.tratamento = procedimento?.nome || '';
       this.form.valorTratamento = procedimento?.valorBase || 0;
+      this.aplicarValorTotalMinimo();
       return;
     }
 
@@ -392,6 +393,7 @@ export class TratamentosComponent implements OnInit {
       this.form.procedimentoSelecao = `procedimento-${procedimentoCadastrado.id}`;
       this.form.tratamento = procedimentoCadastrado.nome;
       this.form.valorTratamento = procedimentoCadastrado.valorBase || 0;
+      this.aplicarValorTotalMinimo();
       return;
     }
 
@@ -410,6 +412,10 @@ export class TratamentosComponent implements OnInit {
     if (this.form.formaPagamento !== 'CARTAO_CREDITO_PARCELADO') {
       this.form.parcelas = 2;
     }
+  }
+
+  aoAlterarValorTratamento(): void {
+    this.aplicarValorTotalMinimo();
   }
 
   aoSelecionarPaciente(): void {
@@ -546,6 +552,16 @@ export class TratamentosComponent implements OnInit {
   private aplicarAvaliacaoExistenteDoPaciente(): void {
     const valorTotalAvaliacao = this.valorTotalAvaliacaoPaciente(this.form.pacienteId);
     this.form.valorTotal = valorTotalAvaliacao;
+    this.aplicarValorTotalMinimo();
+  }
+
+  private aplicarValorTotalMinimo(): void {
+    const valorTratamento = Number(this.form.valorTratamento || 0);
+    const valorTotal = Number(this.form.valorTotal || 0);
+
+    if (valorTratamento > 0 && valorTotal <= 0) {
+      this.form.valorTotal = valorTratamento;
+    }
   }
 
   private valorTotalAvaliacaoPaciente(pacienteId?: number | null): number {
